@@ -613,6 +613,3 @@ mvn clean package -DskipTests
 cd frontend && npm run build
 ```
 
-## License
-
-Private Project - All Rights Reserved
