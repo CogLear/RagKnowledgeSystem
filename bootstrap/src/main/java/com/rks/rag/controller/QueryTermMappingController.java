@@ -1,6 +1,7 @@
 
 package com.rks.rag.controller;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.rks.framework.convention.Result;
 import com.rks.framework.web.Results;
@@ -61,6 +62,7 @@ public class QueryTermMappingController {
      */
     @PostMapping("/mappings")
     public Result<String> create(@RequestBody QueryTermMappingCreateRequest requestParam) {
+        StpUtil.checkRole("admin");
         return Results.success(queryTermMappingAdminService.create(requestParam));
     }
 
@@ -73,6 +75,7 @@ public class QueryTermMappingController {
      */
     @PutMapping("/mappings/{id}")
     public Result<Void> update(@PathVariable String id, @RequestBody QueryTermMappingUpdateRequest requestParam) {
+        StpUtil.checkRole("admin");
         queryTermMappingAdminService.update(id, requestParam);
         return Results.success();
     }
@@ -85,6 +88,7 @@ public class QueryTermMappingController {
      */
     @DeleteMapping("/mappings/{id}")
     public Result<Void> delete(@PathVariable String id) {
+        StpUtil.checkRole("admin");
         queryTermMappingAdminService.delete(id);
         return Results.success();
     }

@@ -53,7 +53,8 @@ function AdminAuth() {
     return <AdminLoginPage />;
   }
 
-  if (user?.role !== "admin") {
+  // 只允许 admin 和 guest 用户访问管理后台
+  if (user?.role !== "admin" && user?.role !== "guest") {
     return <Navigate to="/chat" replace />;
   }
 

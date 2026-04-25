@@ -1,6 +1,7 @@
 
 package com.rks.ingestion.controller;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.rks.framework.convention.Result;
@@ -42,6 +43,7 @@ public class IngestionTaskController {
      */
     @PostMapping("/ingestion/tasks")
     public Result<IngestionResult> create(@RequestBody IngestionTaskCreateRequest request) {
+        StpUtil.checkRole("admin");
         return Results.success(taskService.execute(request));
     }
 
@@ -68,6 +70,7 @@ public class IngestionTaskController {
     @PostMapping(value = "/ingestion/tasks/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Result<IngestionResult> upload(@RequestParam(value = "pipelineId") String pipelineId,
                                           @RequestPart("file") MultipartFile file) {
+        StpUtil.checkRole("admin");
         return Results.success(taskService.upload(pipelineId, file));
     }
 

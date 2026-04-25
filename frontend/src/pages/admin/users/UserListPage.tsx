@@ -53,7 +53,8 @@ const PAGE_SIZE = 10;
 
 const roleOptions = [
   { value: "admin", label: "管理员" },
-  { value: "user", label: "成员" }
+  { value: "user", label: "成员" },
+  { value: "guest", label: "游客" }
 ];
 
 const buildEmptyForm = () => ({
@@ -238,7 +239,8 @@ export function UserListPage() {
               <TableBody>
                 {users.map((user) => {
                   const isProtected = isProtectedAdmin(user);
-                  const roleLabel = user.role === "admin" ? "管理员" : "成员";
+                  const roleLabel =
+                    user.role === "admin" ? "管理员" : user.role === "guest" ? "游客" : "成员";
                   return (
                     <TableRow key={user.id}>
                       <TableCell>

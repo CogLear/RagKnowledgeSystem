@@ -1,4 +1,6 @@
 package com.rks.rag.controller;
+
+import cn.dev33.satoken.stp.StpUtil;
 import com.rks.framework.convention.Result;
 import com.rks.framework.web.Results;
 import com.rks.rag.service.IntentTreeService;
@@ -47,6 +49,7 @@ public class IntentTreeController {
      */
     @PostMapping("/intent-tree")
     public Result<String> createNode(@RequestBody IntentNodeCreateRequest requestParam) {
+        StpUtil.checkRole("admin");
         return Results.success(intentTreeService.createNode(requestParam));
     }
 
@@ -58,6 +61,7 @@ public class IntentTreeController {
      */
     @PutMapping("/intent-tree/{id}")
     public void updateNode(@PathVariable String id, @RequestBody IntentNodeUpdateRequest requestParam) {
+        StpUtil.checkRole("admin");
         intentTreeService.updateNode(id, requestParam);
     }
 
@@ -68,6 +72,7 @@ public class IntentTreeController {
      */
     @DeleteMapping("/intent-tree/{id}")
     public void deleteNode(@PathVariable String id) {
+        StpUtil.checkRole("admin");
         intentTreeService.deleteNode(id);
     }
 
@@ -83,6 +88,7 @@ public class IntentTreeController {
      */
     @PostMapping("/intent-tree/batch/enable")
     public void batchEnable(@RequestBody IntentNodeBatchRequest requestParam) {
+        StpUtil.checkRole("admin");
         intentTreeService.batchEnableNodes(requestParam.getIds());
     }
 
@@ -98,6 +104,7 @@ public class IntentTreeController {
      */
     @PostMapping("/intent-tree/batch/disable")
     public void batchDisable(@RequestBody IntentNodeBatchRequest requestParam) {
+        StpUtil.checkRole("admin");
         intentTreeService.batchDisableNodes(requestParam.getIds());
     }
 
@@ -108,6 +115,7 @@ public class IntentTreeController {
      */
     @PostMapping("/intent-tree/batch/delete")
     public void batchDelete(@RequestBody IntentNodeBatchRequest requestParam) {
+        StpUtil.checkRole("admin");
         intentTreeService.batchDeleteNodes(requestParam.getIds());
     }
 }

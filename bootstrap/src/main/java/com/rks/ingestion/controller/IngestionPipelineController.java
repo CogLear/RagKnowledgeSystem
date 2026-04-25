@@ -1,6 +1,7 @@
 
 package com.rks.ingestion.controller;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.rks.framework.convention.Result;
@@ -36,6 +37,7 @@ public class IngestionPipelineController {
      */
     @PostMapping("/ingestion/pipelines")
     public Result<IngestionPipelineVO> create(@RequestBody IngestionPipelineCreateRequest request) {
+        StpUtil.checkRole("admin");
         return Results.success(pipelineService.create(request));
     }
 
@@ -53,6 +55,7 @@ public class IngestionPipelineController {
     @PutMapping("/ingestion/pipelines/{id}")
     public Result<IngestionPipelineVO> update(@PathVariable String id,
                                               @RequestBody IngestionPipelineUpdateRequest request) {
+        StpUtil.checkRole("admin");
         return Results.success(pipelineService.update(id, request));
     }
 
@@ -94,6 +97,7 @@ public class IngestionPipelineController {
      */
     @DeleteMapping("/ingestion/pipelines/{id}")
     public Result<Void> delete(@PathVariable String id) {
+        StpUtil.checkRole("admin");
         pipelineService.delete(id);
         return Results.success();
     }

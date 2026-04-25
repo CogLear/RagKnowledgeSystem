@@ -1,6 +1,7 @@
 
 package com.rks.knowledge.controller;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.rks.framework.convention.Result;
 import com.rks.framework.web.Results;
@@ -35,6 +36,7 @@ public class KnowledgeBaseController {
      */
     @PostMapping("/knowledge-base")
     public Result<String> createKnowledgeBase(@RequestBody KnowledgeBaseCreateRequest requestParam) {
+        StpUtil.checkRole("admin");
         return Results.success(knowledgeBaseService.create(requestParam));
     }
 
@@ -52,6 +54,7 @@ public class KnowledgeBaseController {
     @PutMapping("/knowledge-base/{kb-id}")
     public Result<Void> renameKnowledgeBase(@PathVariable("kb-id") String kbId,
                                             @RequestBody KnowledgeBaseUpdateRequest requestParam) {
+        StpUtil.checkRole("admin");
         knowledgeBaseService.rename(kbId, requestParam);
         return Results.success();
     }
@@ -68,6 +71,7 @@ public class KnowledgeBaseController {
      */
     @DeleteMapping("/knowledge-base/{kb-id}")
     public Result<Void> deleteKnowledgeBase(@PathVariable("kb-id") String kbId) {
+        StpUtil.checkRole("admin");
         knowledgeBaseService.delete(kbId);
         return Results.success();
     }

@@ -105,6 +105,13 @@ public class UserServiceImpl implements UserService {
         role = normalizeRole(role);
         ensureUsernameAvailable(username, null);
 
+        if (UserRole.GUEST.getCode().equalsIgnoreCase(role)) {
+            LoginUser currentUser = UserContext.get();
+            if (currentUser == null || !UserRole.ADMIN.getCode().equals(currentUser.getRole())) {
+                throw new ClientException("只有管理员可以创建游客账号");
+            }
+        }
+
         UserDO record = UserDO.builder()
                 .username(username)
                 .password(password)
@@ -257,6 +264,9 @@ public class UserServiceImpl implements UserService {
         }
         if (UserRole.USER.getCode().equalsIgnoreCase(value)) {
             return UserRole.USER.getCode();
+        }
+        if (UserRole.GUEST.getCode().equalsIgnoreCase(value)) {
+            return UserRole.GUEST.getCode();
         }
         throw new ClientException("角色类型不合法");
     }

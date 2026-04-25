@@ -1,6 +1,7 @@
 
 package com.rks.rag.controller;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.rks.framework.convention.Result;
 import com.rks.framework.web.Results;
@@ -78,6 +79,7 @@ public class SampleQuestionController {
      */
     @PostMapping("/sample-questions")
     public Result<String> create(@RequestBody SampleQuestionCreateRequest requestParam) {
+        StpUtil.checkRole("admin");
         return Results.success(sampleQuestionService.create(requestParam));
     }
 
@@ -90,6 +92,7 @@ public class SampleQuestionController {
      */
     @PutMapping("/sample-questions/{id}")
     public Result<Void> update(@PathVariable String id, @RequestBody SampleQuestionUpdateRequest requestParam) {
+        StpUtil.checkRole("admin");
         sampleQuestionService.update(id, requestParam);
         return Results.success();
     }
@@ -102,6 +105,7 @@ public class SampleQuestionController {
      */
     @DeleteMapping("/sample-questions/{id}")
     public Result<Void> delete(@PathVariable String id) {
+        StpUtil.checkRole("admin");
         sampleQuestionService.delete(id);
         return Results.success();
     }

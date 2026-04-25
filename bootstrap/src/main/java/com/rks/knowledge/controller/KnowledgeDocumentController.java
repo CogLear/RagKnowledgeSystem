@@ -1,4 +1,6 @@
 package com.rks.knowledge.controller;
+
+import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.rks.framework.convention.Result;
@@ -50,6 +52,7 @@ public class KnowledgeDocumentController {
     public Result<KnowledgeDocumentVO> upload(@PathVariable("kb-id") String kbId,
                                               @RequestPart(value = "file", required = false) MultipartFile file,
                                               @ModelAttribute KnowledgeDocumentUploadRequest requestParam) {
+        StpUtil.checkRole("admin");
         return Results.success(documentService.upload(kbId, requestParam, file));
     }
 
@@ -67,6 +70,7 @@ public class KnowledgeDocumentController {
      */
     @PostMapping("/knowledge-base/docs/{doc-id}/chunk")
     public Result<Void> startChunk(@PathVariable(value = "doc-id") String docId) {
+        StpUtil.checkRole("admin");
         documentService.startChunk(docId);
         return Results.success();
     }
@@ -84,6 +88,7 @@ public class KnowledgeDocumentController {
      */
     @DeleteMapping("/knowledge-base/docs/{doc-id}")
     public Result<Void> delete(@PathVariable(value = "doc-id") String docId) {
+        StpUtil.checkRole("admin");
         documentService.delete(docId);
         return Results.success();
     }
@@ -113,6 +118,7 @@ public class KnowledgeDocumentController {
     @PutMapping("/knowledge-base/docs/{docId}")
     public Result<Void> update(@PathVariable String docId,
                                @RequestBody KnowledgeDocumentUpdateRequest requestParam) {
+        StpUtil.checkRole("admin");
         documentService.update(docId, requestParam);
         return Results.success();
     }
@@ -173,6 +179,7 @@ public class KnowledgeDocumentController {
     @PatchMapping("/knowledge-base/docs/{docId}/enable")
     public Result<Void> enable(@PathVariable String docId,
                                @RequestParam("value") boolean enabled) {
+        StpUtil.checkRole("admin");
         documentService.enable(docId, enabled);
         return Results.success();
     }

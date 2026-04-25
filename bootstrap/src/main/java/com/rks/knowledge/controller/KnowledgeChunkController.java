@@ -17,6 +17,7 @@
 
 package com.rks.knowledge.controller;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.rks.framework.convention.Result;
 import com.rks.framework.web.Results;
@@ -73,6 +74,7 @@ public class KnowledgeChunkController {
     @PostMapping("/knowledge-base/docs/{doc-id}/chunks")
     public Result<KnowledgeChunkVO> create(@PathVariable("doc-id") String docId,
                                            @RequestBody KnowledgeChunkCreateRequest request) {
+        StpUtil.checkRole("admin");
         return Results.success(knowledgeChunkService.create(docId, request));
     }
 
@@ -93,6 +95,7 @@ public class KnowledgeChunkController {
     public Result<Void> update(@PathVariable("doc-id") String docId,
                                @PathVariable("chunk-id") String chunkId,
                                @RequestBody KnowledgeChunkUpdateRequest request) {
+        StpUtil.checkRole("admin");
         knowledgeChunkService.update(docId, chunkId, request);
         return Results.success();
     }
@@ -111,6 +114,7 @@ public class KnowledgeChunkController {
     @DeleteMapping("/knowledge-base/docs/{doc-id}/chunks/{chunk-id}")
     public Result<Void> delete(@PathVariable("doc-id") String docId,
                                @PathVariable("chunk-id") String chunkId) {
+        StpUtil.checkRole("admin");
         knowledgeChunkService.delete(docId, chunkId);
         return Results.success();
     }
@@ -130,6 +134,7 @@ public class KnowledgeChunkController {
     @PostMapping("/knowledge-base/docs/{doc-id}/chunks/{chunk-id}/enable")
     public Result<Void> enable(@PathVariable("doc-id") String docId,
                                @PathVariable("chunk-id") String chunkId) {
+        StpUtil.checkRole("admin");
         knowledgeChunkService.enableChunk(docId, chunkId, true);
         return Results.success();
     }
@@ -149,6 +154,7 @@ public class KnowledgeChunkController {
     @PostMapping("/knowledge-base/docs/{doc-id}/chunks/{chunk-id}/disable")
     public Result<Void> disable(@PathVariable("doc-id") String docId,
                                 @PathVariable("chunk-id") String chunkId) {
+        StpUtil.checkRole("admin");
         knowledgeChunkService.enableChunk(docId, chunkId, false);
         return Results.success();
     }
@@ -167,6 +173,7 @@ public class KnowledgeChunkController {
     @PostMapping("/knowledge-base/docs/{doc-id}/chunks/batch-enable")
     public Result<Void> batchEnable(@PathVariable("doc-id") String docId,
                                     @RequestBody(required = false) KnowledgeChunkBatchRequest request) {
+        StpUtil.checkRole("admin");
         knowledgeChunkService.batchEnable(docId, request);
         return Results.success();
     }
@@ -185,6 +192,7 @@ public class KnowledgeChunkController {
     @PostMapping("/knowledge-base/docs/{doc-id}/chunks/batch-disable")
     public Result<Void> batchDisable(@PathVariable("doc-id") String docId,
                                      @RequestBody(required = false) KnowledgeChunkBatchRequest request) {
+        StpUtil.checkRole("admin");
         knowledgeChunkService.batchDisable(docId, request);
         return Results.success();
     }
@@ -202,6 +210,7 @@ public class KnowledgeChunkController {
      */
     @PostMapping("/knowledge-base/docs/{doc-id}/chunks/rebuild")
     public Result<Void> rebuild(@PathVariable("doc-id") String docId) {
+        StpUtil.checkRole("admin");
         knowledgeChunkService.rebuildByDocId(docId);
         return Results.success();
     }

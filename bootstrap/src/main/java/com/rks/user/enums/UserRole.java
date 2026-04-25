@@ -34,7 +34,12 @@ public enum UserRole {
     /**
      * 普通用户角色
      */
-    USER("user");
+    USER("user"),
+
+    /**
+     * 游客角色 - 只读权限
+     */
+    GUEST("guest");
 
     /**
      * 角色编码
