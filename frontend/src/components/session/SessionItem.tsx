@@ -47,7 +47,6 @@ export function SessionItem({ session, active, onSelect, onDelete }: SessionItem
             variant="ghost"
             size="icon"
             className="opacity-0 transition group-hover:opacity-100"
-            onClick={(event) => event.stopPropagation()}
             aria-label="删除会话"
           >
             <Trash2 className="h-4 w-4" />
@@ -60,14 +59,7 @@ export function SessionItem({ session, active, onSelect, onDelete }: SessionItem
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>取消</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={(event) => {
-                event.stopPropagation();
-                onDelete();
-              }}
-            >
-              删除
-            </AlertDialogAction>
+            <AlertDialogAction onClick={onDelete}>删除</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

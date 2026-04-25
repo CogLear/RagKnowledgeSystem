@@ -11,7 +11,9 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogTitle
+  AlertDialogTitle,
+  AlertDialogPortal,
+  AlertDialogOverlay
 } from "@/components/ui/alert-dialog";
 import {
   DropdownMenu,
@@ -328,7 +330,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                                     ? "text-white/40 hover:bg-white/10"
                                     : "text-[#999999] hover:bg-[#F5F5F5]"
                               )}
-                              onClick={(event) => event.stopPropagation()}
                               aria-label="会话操作"
                             >
                               <MoreHorizontal className="h-4 w-4" />
@@ -383,44 +384,65 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       <AlertDialog
         open={Boolean(deleteTarget)}
         onOpenChange={(open) => {
-          if (!open) {
-            setDeleteTarget(null);
-          }
+          if (!open) setDeleteTarget(null);
         }}
       >
-        <AlertDialogContent
-          className={cn("neo-card", isDark ? "bg-[#1a1a2e]" : "bg-[var(--neo-white)]")}
-        >
-          <AlertDialogHeader>
-            <AlertDialogTitle>删除该会话？</AlertDialogTitle>
-            <AlertDialogDescription>
-              [{deleteTarget?.title || "该会话"}] 将被永久删除，无法恢复。
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className={cn("neo-btn", isDark ? "" : "neo-btn-primary")}>
-              取消
-            </AlertDialogCancel>
-            <AlertDialogAction
-              className={cn("neo-btn", isDark ? "neo-btn-primary" : "")}
-              onClick={() => {
-                if (!deleteTarget) return;
-                const target = deleteTarget;
-                const isCurrent = currentSessionId === target.id;
-                setDeleteTarget(null);
-                deleteSession(target.id)
-                  .then(() => {
-                    if (isCurrent) {
-                      navigate("/chat");
-                    }
-                  })
-                  .catch(() => null);
-              }}
-            >
-              删除
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
+        {deleteTarget && (
+          <AlertDialogPortal>
+            <div style={{ position: "fixed", inset: 0, zIndex: 50 }}>
+              <AlertDialogOverlay
+                className="ui-alert-dialog-overlay"
+                onClick={() => setDeleteTarget(null)}
+              />
+              <AlertDialogContent
+                className={cn("neo-card", isDark ? "bg-[#1a1a2e]" : "bg-[var(--neo-white)]")}
+                style={{
+                  position: "fixed",
+                  left: "50%",
+                  top: "50%",
+                  transform: "translate(-50%, -50%)",
+                  zIndex: 51
+                }}
+              >
+                <AlertDialogHeader>
+                  <AlertDialogTitle
+                    className={isDark ? "text-[var(--neo-yellow)]" : "text-[var(--neo-dark)]"}
+                  >
+                    删除该会话？
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    [{deleteTarget?.title || "该会话"}] 将被永久删除，无法恢复。
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel
+                    className={cn("neo-btn", isDark ? "" : "neo-btn-primary")}
+                    onClick={() => setDeleteTarget(null)}
+                  >
+                    取消
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    className={cn("neo-btn", isDark ? "neo-btn-primary" : "")}
+                    onClick={() => {
+                      const target = deleteTarget;
+                      const isCurrent = currentSessionId === target.id;
+                      setDeleteTarget(null);
+                      deleteSession(target.id)
+                        .then(() => {
+                          if (isCurrent) {
+                            navigate("/chat");
+                          }
+                        })
+                        .catch(() => null);
+                    }}
+                  >
+                    删除
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </div>
+          </AlertDialogPortal>
+        )}
       </AlertDialog>
     </>
   );
