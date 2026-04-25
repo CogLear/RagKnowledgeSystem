@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="bootstrap" />
+        <module name="framework" />
+        <module name="mcp-server" />
+        <module name="infra-ai" />
+      </profile>
+    </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="RagKnowledgeSystem" options="-parameters" />
+      <module name="bootstrap" options="-parameters" />
+      <module name="framework" options="-parameters" />
+      <module name="infra-ai" options="-parameters" />
+      <module name="mcp-server" options="-parameters" />
+    </option>
+  </component>
+</project>
