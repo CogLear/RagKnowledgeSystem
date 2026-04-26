@@ -63,6 +63,7 @@ public class SystemSettingsVO {
         @Builder
         public static class ProviderConfig {
             private String url;
+            @com.fasterxml.jackson.annotation.JsonIgnore
             private String apiKey;
             private Map<String, String> endpoints;
         }

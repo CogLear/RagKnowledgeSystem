@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="94bb44ff-cfc3-4ab9-90c9-10843f4b1508" name="更改" comment="修复对话框删除bug">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/user/service/impl/UserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/user/service/impl/UserServiceImpl.java" afterDir="false" />
-    </list>
+    <list default="true" id="94bb44ff-cfc3-4ab9-90c9-10843f4b1508" name="更改" comment="前端调整" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -89,7 +86,7 @@
       <workItem from="1777121357299" duration="310000" />
       <workItem from="1777124716624" duration="1793000" />
       <workItem from="1777175057301" duration="792000" />
-      <workItem from="1777176497106" duration="407000" />
+      <workItem from="1777176497106" duration="883000" />
     </task>
     <task id="LOCAL-00001" summary="初次提交">
       <option name="closed" value="true" />
@@ -107,7 +104,15 @@
       <option name="project" value="LOCAL" />
       <updated>1777138179814</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="前端调整">
+      <option name="closed" value="true" />
+      <created>1777177186172</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1777177186172</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -137,6 +142,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="初次提交" />
     <MESSAGE value="修复对话框删除bug" />
-    <option name="LAST_COMMIT_MESSAGE" value="修复对话框删除bug" />
+    <MESSAGE value="前端调整" />
+    <option name="LAST_COMMIT_MESSAGE" value="前端调整" />
   </component>
 </project>
