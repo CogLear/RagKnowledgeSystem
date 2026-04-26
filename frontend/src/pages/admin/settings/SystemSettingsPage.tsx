@@ -143,8 +143,8 @@ export function SystemSettingsPage() {
           <Table className="min-w-[760px]">
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[140px]">Provider</TableHead>
-                <TableHead className="w-[240px]">URL</TableHead>
+                <TableHead className="w-[200px]">Provider</TableHead>
+                <TableHead className="flex-1 w-[400px]">URL</TableHead>
                 <TableHead>Endpoints</TableHead>
               </TableRow>
             </TableHeader>
