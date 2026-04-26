@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.rks.framework.context.LoginUser;
 import com.rks.framework.context.UserContext;
 import com.rks.framework.convention.Result;
+import com.rks.framework.exception.ClientException;
 import com.rks.framework.web.Results;
 import com.rks.user.controller.request.ChangePasswordRequest;
 import com.rks.user.controller.request.UserCreateRequest;
@@ -130,6 +131,10 @@ public class UserController {
      */
     @PutMapping("/user/password")
     public Result<Void> changePassword(@RequestBody ChangePasswordRequest requestParam) {
+        LoginUser user = UserContext.get();
+        if (user != null && "guest".equals(user.getRole())) {
+            throw new ClientException("游客角色无权修改密码");
+        }
         userService.changePassword(requestParam);
         return Results.success();
     }

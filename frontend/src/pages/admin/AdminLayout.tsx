@@ -675,10 +675,12 @@ export function AdminLayout() {
                     {user?.username || "管理员"} · {roleLabel}
                   </div>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => setPasswordOpen(true)}>
-                    <KeyRound className="mr-2 h-4 w-4" />
-                    修改密码
-                  </DropdownMenuItem>
+                  {user?.role !== "guest" && (
+                    <DropdownMenuItem onClick={() => setPasswordOpen(true)}>
+                      <KeyRound className="mr-2 h-4 w-4" />
+                      修改密码
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem
                     onClick={handleLogout}
                     className="text-rose-600 focus:text-rose-600"
