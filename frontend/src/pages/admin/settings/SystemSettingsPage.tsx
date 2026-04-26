@@ -145,7 +145,6 @@ export function SystemSettingsPage() {
               <TableRow>
                 <TableHead className="w-[140px]">Provider</TableHead>
                 <TableHead className="w-[240px]">URL</TableHead>
-                <TableHead className="w-[200px]">API Key</TableHead>
                 <TableHead>Endpoints</TableHead>
               </TableRow>
             </TableHeader>
@@ -154,7 +153,6 @@ export function SystemSettingsPage() {
                 <TableRow key={name}>
                   <TableCell className="font-medium">{name}</TableCell>
                   <TableCell>{provider.url}</TableCell>
-                  <TableCell>{provider.apiKey ? provider.apiKey : "-"}</TableCell>
                   <TableCell>
                     <div className="space-y-1 text-xs text-muted-foreground">
                       {Object.entries(provider.endpoints).map(([key, value]) => (
