@@ -17,7 +17,7 @@ spring:
     type: com.zaxxer.hikari.HikariDataSource
     username: root
     password: 123456
-    url: jdbc:mysql://127.0.0.1:3306/ragsystem?characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&serverTimezone=GMT%2B8&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://127.0.0.1/ragsystem?characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&serverTimezone=GMT%2B8&allowPublicKeyRetrieval=true
     hikari:
       connection-timeout: 5000
       idle-timeout: 600000
@@ -30,6 +30,7 @@ spring:
     redis:
       host: 127.0.0.1
       port: 6379
+      password: 123456
 
 milvus:
   uri: http://localhost:19530

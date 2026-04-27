@@ -2,10 +2,10 @@ server:
   port: 9099
 spring:
   application:
-    name: ragent-mcp-server
+    name: rag-mcp-server
 mcp:
   mysql:
-    host: localhost
+    host: 127.0.0.1
     port: 3306
     database: testdatabase
     username: root

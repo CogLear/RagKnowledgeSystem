@@ -4,7 +4,11 @@
       "Bash(mvn compile *)",
       "Bash(npm run *)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173/)",
-      "mcp__plugin_everything-claude-code_playwright__browser_console_messages"
+      "mcp__plugin_everything-claude-code_playwright__browser_console_messages",
+      "Read(//d/apache-maven-3.9.15/conf/**)"
+    ],
+    "additionalDirectories": [
+      "D:\\apache-maven-3.9.15\\conf"
     ]
   }
 }
