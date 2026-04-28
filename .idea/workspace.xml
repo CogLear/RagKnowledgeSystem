@@ -4,13 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="94bb44ff-cfc3-4ab9-90c9-10843f4b1508" name="更改" comment="打包准备">
-      <change beforePath="$PROJECT_DIR$/.claude/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.json" afterDir="false" />
+    <list default="true" id="94bb44ff-cfc3-4ab9-90c9-10843f4b1508" name="更改" comment="redis密码">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/dist/assets/index-jcs5YbQ9.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/dist/assets/index-yHl-cnXn.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/dist/favicon.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/dist/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/LoginPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/LoginPage.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -98,7 +94,7 @@
       <workItem from="1777265927260" duration="3271000" />
       <workItem from="1777274074647" duration="8035000" />
       <workItem from="1777370667876" duration="2000" />
-      <workItem from="1777370704002" duration="1682000" />
+      <workItem from="1777370704002" duration="2402000" />
     </task>
     <task id="LOCAL-00001" summary="初次提交">
       <option name="closed" value="true" />
@@ -140,7 +136,23 @@
       <option name="project" value="LOCAL" />
       <updated>1777302262789</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="redis密码">
+      <option name="closed" value="true" />
+      <created>1777380498178</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1777380498178</updated>
+    </task>
+    <task id="LOCAL-00007" summary="redis密码">
+      <option name="closed" value="true" />
+      <created>1777380514971</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1777380514971</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -173,6 +185,7 @@
     <MESSAGE value="前端调整" />
     <MESSAGE value="guest不能修改密码" />
     <MESSAGE value="打包准备" />
-    <option name="LAST_COMMIT_MESSAGE" value="打包准备" />
+    <MESSAGE value="redis密码" />
+    <option name="LAST_COMMIT_MESSAGE" value="redis密码" />
   </component>
 </project>
