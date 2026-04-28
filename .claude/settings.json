@@ -5,7 +5,8 @@
       "Bash(npm run *)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173/)",
       "mcp__plugin_everything-claude-code_playwright__browser_console_messages",
-      "Read(//d/apache-maven-3.9.15/conf/**)"
+      "Read(//d/apache-maven-3.9.15/conf/**)",
+      "Bash(redis-cli -a 123456 PING)"
     ],
     "additionalDirectories": [
       "D:\\apache-maven-3.9.15\\conf"
