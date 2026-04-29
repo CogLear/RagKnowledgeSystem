@@ -125,12 +125,7 @@ const menuItems: MenuItem[] = [
     label: "关键词映射",
     icon: KeyRound
   },
-  {
-    path: "/admin/sample-questions",
-    label: "示例问题",
-    icon: Lightbulb
-  },
-  {
+    {
     path: "/admin/users",
     label: "用户管理",
     icon: Users
@@ -149,8 +144,7 @@ const breadcrumbMap: Record<string, string> = {
   "intent-list": "意图列表",
   ingestion: "数据通道",
   traces: "链路追踪",
-  "sample-questions": "示例问题",
-  mappings: "关键词映射",
+    mappings: "关键词映射",
   settings: "系统设置",
   users: "用户管理"
 };

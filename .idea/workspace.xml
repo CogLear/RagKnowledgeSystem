@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="94bb44ff-cfc3-4ab9-90c9-10843f4b1508" name="更改" comment="修复前端状态管理耦合" />
+    <list default="true" id="94bb44ff-cfc3-4ab9-90c9-10843f4b1508" name="更改" comment="修复管理后台退出是管理员" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -92,7 +92,7 @@
       <workItem from="1777274074647" duration="8035000" />
       <workItem from="1777370667876" duration="2000" />
       <workItem from="1777370704002" duration="3208000" />
-      <workItem from="1777431309409" duration="2027000" />
+      <workItem from="1777431309409" duration="2394000" />
     </task>
     <task id="LOCAL-00001" summary="初次提交">
       <option name="closed" value="true" />
@@ -190,7 +190,15 @@
       <option name="project" value="LOCAL" />
       <updated>1777433319586</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="修复管理后台退出是管理员">
+      <option name="closed" value="true" />
+      <created>1777433702538</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1777433702538</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -229,6 +237,7 @@
     <MESSAGE value="修复批量创建 Chunk 索引分配竞态条件" />
     <MESSAGE value="修复Milvus 写入失败数据不一致" />
     <MESSAGE value="修复前端状态管理耦合" />
-    <option name="LAST_COMMIT_MESSAGE" value="修复前端状态管理耦合" />
+    <MESSAGE value="修复管理后台退出是管理员" />
+    <option name="LAST_COMMIT_MESSAGE" value="修复管理后台退出是管理员" />
   </component>
 </project>
