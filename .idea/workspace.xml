@@ -4,12 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="94bb44ff-cfc3-4ab9-90c9-10843f4b1508" name="更改" comment="删除示例问题">
+    <list default="true" id="94bb44ff-cfc3-4ab9-90c9-10843f4b1508" name="更改" comment="修复意图树缓存无本地层">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/rag/core/intent/IntentTreeCacheManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/rag/core/intent/IntentTreeCacheManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bootstrap/target/classes/com/rks/rag/core/intent/IntentTreeCacheManager$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/target/classes/com/rks/rag/core/intent/IntentTreeCacheManager$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bootstrap/target/classes/com/rks/rag/core/intent/IntentTreeCacheManager.class" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/target/classes/com/rks/rag/core/intent/IntentTreeCacheManager.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/技术改进建议报告.md" beforeDir="false" afterPath="$PROJECT_DIR$/技术改进建议报告.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/技术改进建议报告.md" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -98,7 +95,8 @@
       <workItem from="1777274074647" duration="8035000" />
       <workItem from="1777370667876" duration="2000" />
       <workItem from="1777370704002" duration="3208000" />
-      <workItem from="1777431309409" duration="3070000" />
+      <workItem from="1777431309409" duration="3935000" />
+      <workItem from="1777443576806" duration="938000" />
     </task>
     <task id="LOCAL-00001" summary="初次提交">
       <option name="closed" value="true" />
@@ -212,7 +210,15 @@
       <option name="project" value="LOCAL" />
       <updated>1777433988365</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="修复意图树缓存无本地层">
+      <option name="closed" value="true" />
+      <created>1777434501175</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1777434501175</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -253,6 +259,7 @@
     <MESSAGE value="修复前端状态管理耦合" />
     <MESSAGE value="修复管理后台退出是管理员" />
     <MESSAGE value="删除示例问题" />
-    <option name="LAST_COMMIT_MESSAGE" value="删除示例问题" />
+    <MESSAGE value="修复意图树缓存无本地层" />
+    <option name="LAST_COMMIT_MESSAGE" value="修复意图树缓存无本地层" />
   </component>
 </project>
