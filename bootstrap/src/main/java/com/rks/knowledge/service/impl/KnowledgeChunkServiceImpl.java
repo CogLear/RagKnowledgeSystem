@@ -183,11 +183,12 @@ public class KnowledgeChunkServiceImpl implements KnowledgeChunkService {
                 .createdBy(UserContext.getUsername())
                 .build();
 
+        // 先写入 Milvus，成功后再写 MySQL，保证数据一致性
+        // 如果 Milvus 失败，MySQL 不会执行；如果 Milvus 成功但 MySQL 失败，事务回滚
+        syncChunkToMilvus(String.valueOf(documentDO.getKbId()), docId, chunkDO, embeddingModel);
+
         chunkMapper.insert(chunkDO);
         log.info("新增 Chunk 成功, kbId={}, docId={}, chunkId={}, chunkIndex={}", documentDO.getKbId(), docId, chunkDO.getId(), chunkIndex);
-
-        // 同步写入 Milvus
-        syncChunkToMilvus(String.valueOf(documentDO.getKbId()), docId, chunkDO, embeddingModel);
 
         return BeanUtil.toBean(chunkDO, KnowledgeChunkVO.class);
     }
@@ -290,9 +291,7 @@ public class KnowledgeChunkServiceImpl implements KnowledgeChunkService {
             chunkDOList.add(chunkDO);
         }
 
-        // 批量写入数据库，向量索引由上层统一处理以避免重复计算
-        chunkMapper.insert(chunkDOList);
-
+        // 先写入 Milvus（如果需要），成功后再写 MySQL，保证数据一致性
         if (writeVector) {
             String kbIdStr = String.valueOf(documentDO.getKbId());
             List<VectorChunk> vectorChunks = chunkDOList.stream()
@@ -304,9 +303,13 @@ public class KnowledgeChunkServiceImpl implements KnowledgeChunkService {
                     .toList();
             if (CollUtil.isNotEmpty(vectorChunks)) {
                 attachEmbeddings(vectorChunks, embeddingModel);
+                // Milvus 写入失败会抛出异常，不会执行到 MySQL 插入
                 vectorStoreService.indexDocumentChunks(kbIdStr, docId, vectorChunks);
             }
         }
+
+        // 批量写入数据库
+        chunkMapper.insert(chunkDOList);
     }
 
     /**
