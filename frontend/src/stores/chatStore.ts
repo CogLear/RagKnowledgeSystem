@@ -18,6 +18,7 @@ import { stopTask, submitFeedback } from "@/services/chatService";
 import { buildQuery } from "@/utils/helpers";
 import { createStreamResponse } from "@/hooks/useStreamResponse";
 import { storage } from "@/utils/storage";
+import { authEvents } from "@/stores/authEvents";
 
 interface ChatState {
   sessions: Session[];
@@ -528,3 +529,23 @@ export const useChatStore = create<ChatState>((set, get) => ({
     }
   }
 }));
+
+// 监听 auth 事件，解耦 authStore 和 chatStore
+authEvents.subscribe((event) => {
+  if (event.type === "login" || event.type === "logout") {
+    useChatStore.setState({
+      sessions: [],
+      currentSessionId: null,
+      messages: [],
+      isLoading: false,
+      isStreaming: false,
+      isCreatingNew: true,
+      deepThinkingEnabled: false,
+      thinkingStartAt: null,
+      streamTaskId: null,
+      streamAbort: null,
+      streamingMessageId: null,
+      cancelRequested: false
+    });
+  }
+});

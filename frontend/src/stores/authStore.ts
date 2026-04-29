@@ -11,7 +11,7 @@ import {
   logout as logoutRequest
 } from "@/services/authService";
 import { setAuthToken } from "@/services/api";
-import { useChatStore } from "@/stores/chatStore";
+import { authEvents } from "@/stores/authEvents";
 import { storage } from "@/utils/storage";
 
 interface AuthState {
@@ -48,21 +48,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       get()
         .fetchCurrentUser()
         .catch(() => null);
-      useChatStore.getState().cancelGeneration();
-      useChatStore.setState({
-        sessions: [],
-        currentSessionId: null,
-        messages: [],
-        isLoading: false,
-        isStreaming: false,
-        isCreatingNew: true,
-        deepThinkingEnabled: false,
-        thinkingStartAt: null,
-        streamTaskId: null,
-        streamAbort: null,
-        streamingMessageId: null,
-        cancelRequested: false
-      });
+      authEvents.emit("login");
       toast.success("登录成功");
     } catch (error) {
       toast.error((error as Error).message || "登录失败");
@@ -77,21 +63,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } catch {
       // Ignore network errors on logout
     }
-    useChatStore.getState().cancelGeneration();
-    useChatStore.setState({
-      sessions: [],
-      currentSessionId: null,
-      messages: [],
-      isLoading: false,
-      isStreaming: false,
-      isCreatingNew: false,
-      deepThinkingEnabled: false,
-      thinkingStartAt: null,
-      streamTaskId: null,
-      streamAbort: null,
-      streamingMessageId: null,
-      cancelRequested: false
-    });
+    authEvents.emit("logout");
     storage.clearAuth();
     setAuthToken(null);
     set({ user: null, token: null, isAuthenticated: false });
