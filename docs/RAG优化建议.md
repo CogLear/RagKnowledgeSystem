@@ -63,6 +63,7 @@
 | **生成** | LLM 路由 (Bailian/SiliconFlow/Ollama) | ✅ |
 | **工具调用** | MCP 协议支持 | ✅ |
 | **缓存** | 向量嵌入缓存 (L1+L2) | ✅ 已实现 |
+| **缓存** | 检索结果缓存 (L1+L2) | ✅ 已实现 |
 
 ---
 
@@ -82,25 +83,39 @@ L2: Redis (可配置TTL, 默认7天)
 - `infra-ai/.../embedding/EmbeddingCacheManager.java` - 缓存管理器
 - `infra-ai/.../embedding/RoutingEmbeddingService.java` - 缓存逻辑注入
 
+**验证结果**:
+- 首次请求 "入职需要准备的材料"：Embedding 生成
+- 再次请求相同问题：`Embedding 缓存命中, text长度=9` ✅
+
 ---
 
 ### 2.2 检索结果缓存
 
-**现状**: 每次对话请求都执行完整的检索流程。
-
-**优化方案**: 缓存 `RetrievalContext`
+**状态**: ✅ 已实现
 
 ```
-Key 格式: rag:retrieve:{hash(question + intent_signature + topK)}
-Value: RetrievedChunk[]
-TTL: 5-15分钟（知识库更新频率决定）
+Key 格式: ragent:retrieve:{SHA256(subQuestion|intentIds|topK)[:24]}
+L1: Guava LoadingCache (容量500, 5分钟过期)
+L2: Redis (可配置TTL, 默认10分钟)
 ```
 
-**收益**:
-- 多轮对话中相同意图的检索直接返回
-- 减轻 Milvus 搜索压力
+**实现文件**:
+- `bootstrap/.../retrieve/RetrievalCacheManager.java` - 缓存管理器
+- `bootstrap/.../retrieve/RetrievalEngine.java` - 缓存逻辑注入
+- `bootstrap/.../knowledge/service/impl/KnowledgeChunkServiceImpl.java` - 缓存失效联动
 
-**注意**: 需要与知识库更新联动，当知识库变更时清除相关缓存。
+**缓存 Key 设计要点**:
+- 只使用问题文本 + 意图节点 ID（排序后），不包含分数
+- 原因：LLM 生成的意图分数有随机性（0.95 vs 0.9），导致 Key 不一致
+
+**失效联动**:
+- 知识库变更时（create/update/delete/enableChunk/rebuildByDocId/batchEnable）
+- 自动调用 `retrievalCacheManager.clearAll()` 清除缓存
+
+**验证结果**:
+- 首次请求：Cache Key `e957f262fab58e37a9fe0b77`，写入缓存，耗时 ~1.8s
+- 第二次请求：Cache Key 相同，`检索缓存命中`，跳过检索流程 ✅
+- 第三次请求：缓存再次命中 ✅
 
 ---
 
@@ -148,26 +163,39 @@ milvus:
 
 ---
 
-### 3.3 低分结果过滤与扩展搜索
+### 3.3 低分结果过滤
 
-**现状**: 代码中有 TODO 注释但未实现。
+**状态**: ✅ 已实现
 
-```java
-// MilvusRetrieverService.java
-// TODO: consider filtering low-score results (e.g., score < 0.65)
-// TODO: if many high-score results, consider expanding search
+**实现方案**: 新增 `ScoreFilterPostProcessor` 后置处理器
+
+```
+执行顺序:
+1. DeduplicationPostProcessor (order=1) - 去重
+2. ScoreFilterPostProcessor (order=5) - 分数过滤
+3. RerankPostProcessor (order=10) - 重排序
 ```
 
-**优化方案**:
-
+**配置**:
 ```yaml
 rag:
   search:
-    min-score-threshold: 0.65
-    expand-search:
-      enabled: true
-      min-high-score-count: 3  # 高分结果少于3个时启用扩展搜索
+    channels:
+      vector-global:
+        confidence-threshold: 0.6
+        top-k-multiplier: 3
+        min-chunk-score: 0.65        # 低于此分数的 Chunk 被过滤
+      intent-directed:
+        min-intent-score: 0.4
+        top-k-multiplier: 2
+        min-chunk-score: 0.65
 ```
+
+**实现文件**:
+- `bootstrap/.../retrieve/postprocessor/ScoreFilterPostProcessor.java` - 分数过滤器
+- `bootstrap/.../config/SearchChannelProperties.java` - 配置类
+
+**注意**: 扩展搜索功能暂未实现，当前通过各通道的 `topKMultiplier` 参数实现扩展效果
 
 ---
 
@@ -430,9 +458,9 @@ evaluation:
 | 优先级 | 优化项 | 难度 | 收益 | 状态 |
 |-------|--------|------|------|------|
 | P0 | 向量嵌入缓存 | 低 | 高 | ✅ 已完成 |
+| P0 | 检索结果缓存 | 中 | 高 | ✅ 已完成 |
 | P0 | Milvus 超时与重试 | 低 | 高 | 待实施 |
-| P1 | 检索结果缓存 | 中 | 高 | 待实施 |
-| P1 | 低分过滤与扩展搜索 | 低 | 中 | 待实施 |
+| P1 | 低分过滤 | 低 | 中 | ✅ 已完成 |
 | P2 | 混合检索 | 高 | 高 | 长期规划 |
 | P2 | 查询扩展 | 中 | 中 | 待实施 |
 | P3 | 动态分块 | 高 | 中 | 长期规划 |
@@ -474,29 +502,32 @@ rag:
     enabled: true
     max-history-messages: 4
     max-history-chars: 500
+  cache:
+    retrieval:
+      enabled: true                    # ✅ 已实现
+      ttl-minutes: 10                  # ✅ 已实现
   search:
     channels:
       vector-global:
         confidence-threshold: 0.6
         top-k-multiplier: 3
+        min-chunk-score: 0.65          # ✅ 已实现
       intent-directed:
         min-intent-score: 0.4
         top-k-multiplier: 2
+        min-chunk-score: 0.65          # ✅ 已实现
 ```
 
-建议新增配置节:
+**已实现的配置**:
+- `ai.embedding.cache.*` - 向量嵌入缓存 ✅
+- `rag.cache.retrieval.*` - 检索结果缓存 ✅
+- `rag.search.channels.*.min-chunk-score` - 低分过滤 ✅
+
+**待实现配置建议**:
 
 ```yaml
 rag:
   optimization:
-    # 缓存配置
-    embedding-cache:
-      enabled: true
-      ttl-minutes: 60
-    retrieval-cache:
-      enabled: true
-      ttl-minutes: 10
-
     # 检索配置
     search:
       min-score-threshold: 0.65

@@ -84,9 +84,11 @@ rag:
       vector-global:
         confidence-threshold: 0.6
         top-k-multiplier: 3
+        min-chunk-score: 0.65
       intent-directed:
         min-intent-score: 0.4
         top-k-multiplier: 2
+        min-chunk-score: 0.65
 
   trace:
     enabled: true

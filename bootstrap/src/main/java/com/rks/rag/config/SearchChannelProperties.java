@@ -51,6 +51,17 @@ public class SearchChannelProperties {
          * 全局检索时召回更多候选，后续通过 Rerank 筛选
          */
         private int topKMultiplier = 3;
+
+        /**
+         * 最小 Chunk 分数阈值
+         * 低于此分数的结果将被过滤
+         */
+        private double minChunkScore = 0.65;
+
+        /**
+         * 扩展搜索配置
+         */
+        private Expansion expansion = new Expansion();
     }
 
     @Data
@@ -71,5 +82,41 @@ public class SearchChannelProperties {
          * TopK 倍数
          */
         private int topKMultiplier = 2;
+
+        /**
+         * 最小 Chunk 分数阈值
+         * 低于此分数的结果将被过滤
+         */
+        private double minChunkScore = 0.65;
+
+        /**
+         * 扩展搜索配置
+         */
+        private Expansion expansion = new Expansion();
+    }
+
+    @Data
+    public static class Expansion {
+
+        /**
+         * 是否启用扩展搜索
+         */
+        private boolean enabled = false;
+
+        /**
+         * 高分结果数量阈值
+         * 低于此数量时触发扩展搜索
+         */
+        private int minHighScoreCount = 3;
+
+        /**
+         * 高分分数阈值
+         */
+        private double highScoreThreshold = 0.7;
+
+        /**
+         * 扩展搜索的 topK 扩倍数
+         */
+        private int topkMultiplier = 2;
     }
 }
