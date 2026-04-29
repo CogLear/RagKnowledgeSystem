@@ -1,0 +1,410 @@
+{
+  "summary": {
+    "total": 25,
+    "success": 25,
+    "failed": 0,
+    "timestamp": "2026-04-29 23:47:56"
+  },
+  "results": [
+    {
+      "level": "L1",
+      "question": "试用期有多久？",
+      "answer": "未检索到与问题相关的文档内容。",
+      "reference": "统一为3个月，劳动合同期限3年。",
+      "contexts_count": 0,
+      "trace_id": null,
+      "duration_ms": 1654,
+      "error": null,
+      "metrics": {
+        "faithfulness": null,
+        "answer_relevancy": null,
+        "context_precision": null,
+        "context_recall": null
+      }
+    },
+    {
+      "level": "L1",
+      "question": "工资什么时候发？",
+      "answer": "未检索到与问题相关的文档内容。",
+      "reference": "每月15日发放上月工资。如遇节假日提前至前一个工作日。",
+      "contexts_count": 0,
+      "trace_id": null,
+      "duration_ms": 2485,
+      "error": null,
+      "metrics": {
+        "faithfulness": null,
+        "answer_relevancy": null,
+        "context_precision": null,
+        "context_recall": null
+      }
+    },
+    {
+      "level": "L1",
+      "question": "公司地址是什么？",
+      "answer": "未检索到与问题相关的文档内容。",
+      "reference": "北京市朝阳区建国路88号SOHO现代城A座18层。",
+      "contexts_count": 0,
+      "trace_id": null,
+      "duration_ms": 1734,
+      "error": null,
+      "metrics": {
+        "faithfulness": null,
+        "answer_relevancy": null,
+        "context_precision": null,
+        "context_recall": null
+      }
+    },
+    {
+      "level": "L1",
+      "question": "年假怎么计算？",
+      "answer": "年假的计算主要根据员工的司龄和入职时间来确定，具体分为新员工、在职员工以及试用期员工的不同情况。\n\n### 一、基本年假标准\n\n- **满1年**：入职满1年后，可享5天年假\n- **满3年**：第3个周年起，年假增至10天\n- **满5年**：第5个周年起，增至15天\n- **满10年**：第10个周年起，增至20天\n\n年假额度从对应的司龄周年日起开始生效。\n\n### 二、新入职员工年假计算\n\n...",
+      "reference": "入职满1年享5天，以后每满1年增加：满3年10天，满5年15天，满10年20天。",
+      "contexts_count": 0,
+      "trace_id": null,
+      "duration_ms": 9199,
+      "error": null,
+      "metrics": {
+        "faithfulness": null,
+        "answer_relevancy": null,
+        "context_precision": null,
+        "context_recall": null
+      }
+    },
+    {
+      "level": "L1",
+      "question": "病假需要什么证明？",
+      "answer": "未检索到与问题相关的文档内容。",
+      "reference": "3天以内需医院诊断证明；3天以上需诊断证明+病历；7天以上需完整病历+检查报告。",
+      "contexts_count": 0,
+      "trace_id": null,
+      "duration_ms": 3200,
+      "error": null,
+      "metrics": {
+        "faithfulness": null,
+        "answer_relevancy": null,
+        "context_precision": null,
+        "context_recall": null
+      }
+    },
+    {
+      "level": "L1",
+      "question": "报销多久能到账？",
+      "answer": "未检索到与问题相关的文档内容。",
+      "reference": "审批通过后3个工作日内打款。",
+      "contexts_count": 0,
+      "trace_id": null,
+      "duration_ms": 1721,
+      "error": null,
+      "metrics": {
+        "faithfulness": null,
+        "answer_relevancy": null,
+        "context_precision": null,
+        "context_recall": null
+      }
+    },
+    {
+      "level": "L1",
+      "question": "出差怎么申请？",
+      "answer": "未检索到与问题相关的文档内容。",
+      "reference": "出差前在OA系统提交出差申请，填写目的地、事由、时间，经直属上级审批。",
+      "contexts_count": 0,
+      "trace_id": null,
+      "duration_ms": 2747,
+      "error": null,
+      "metrics": {
+        "faithfulness": null,
+        "answer_relevancy": null,
+        "context_precision": null,
+        "context_recall": null
+      }
+    },
+    {
+      "level": "L1",
+      "question": "企业邮箱密码忘了怎么办？",
+      "answer": "如果忘记了企业邮箱密码，可以通过自助渠道进行找回：访问 https://password.company.com，按照页面提示完成身份验证后重置密码。\n\n首次登录时系统会强制要求更换密码，且新密码不能与最近5次使用过的密码相同。设置密码时需注意避免使用简单组合，如123456、password、qwerty，也不得使用企业名称、个人生日、电话号码或与用户名相同或倒序的字符串。",
+      "reference": "访问 password.company.com 自助找回，或联系IT部门重置。",
+      "contexts_count": 0,
+      "trace_id": null,
+      "duration_ms": 5976,
+      "error": null,
+      "metrics": {
+        "faithfulness": null,
+        "answer_relevancy": null,
+        "context_precision": null,
+        "context_recall": null
+      }
+    },
+    {
+      "level": "L1",
+      "question": "电脑坏了联系谁？",
+      "answer": "未检索到与问题相关的文档内容。",
+      "reference": "提交IT工单或拨打热线010-12345679，2小时内响应，紧急情况可电话催促。",
+      "contexts_count": 0,
+      "trace_id": null,
+      "duration_ms": 2190,
+      "error": null,
+      "metrics": {
+        "faithfulness": null,
+        "answer_relevancy": null,
+        "context_precision": null,
+        "context_recall": null
+      }
+    },
+    {
+      "level": "L1",
+      "question": "收到钓鱼邮件怎么办？",
+      "answer": "未检索到与问题相关的文档内容。",
+      "reference": "不要点击任何链接或附件，立即报告IT部门（it-emergency@company.com）。",
+      "contexts_count": 0,
+      "trace_id": null,
+      "duration_ms": 1701,
+      "error": null,
+      "metrics": {
+        "faithfulness": null,
+        "answer_relevancy": null,
+        "context_precision": null,
+        "context_recall": null
+      }
+    },
+    {
+      "level": "L2",
+      "question": "入职第一个月社保怎么缴纳？",
+      "answer": "未检索到与问题相关的文档内容。",
+      "reference": "15日前入职当月参保，15日后入职次月参保。HR会办理相关手续。",
+      "contexts_count": 0,
+      "trace_id": null,
+      "duration_ms": 2426,
+      "error": null,
+      "metrics": {
+        "faithfulness": null,
+        "answer_relevancy": null,
+        "context_precision": null,
+        "context_recall": null
+      }
+    },
+    {
+      "level": "L2",
+      "question": "可以推迟入职吗？",
+      "answer": "如果有特殊情况需要推迟入职，可以在收到offer后的3天内联系HR申请延期，最长可延期不超过2周。如果入职当天临时有事无法到场，需要提前联系HR小李（010-12345671）说明情况，并重新预约入职时间。",
+      "reference": "如有特殊情况可在收到offer后3天内联系HR申请延期，最长不超过2周。",
+      "contexts_count": 0,
+      "trace_id": null,
+      "duration_ms": 3466,
+      "error": null,
+      "metrics": {
+        "faithfulness": null,
+        "answer_relevancy": null,
+        "context_precision": null,
+        "context_recall": null
+      }
+    },
+    {
+      "level": "L2",
+      "question": "忘记打卡怎么办？",
+      "answer": "未检索到与问题相关的文档内容。",
+      "reference": "每月3次补卡机会，在OA系统申请补卡，说明原因即可。第4次起需总监审批。",
+      "contexts_count": 0,
+      "trace_id": null,
+      "duration_ms": 1998,
+      "error": null,
+      "metrics": {
+        "faithfulness": null,
+        "answer_relevancy": null,
+        "context_precision": null,
+        "context_recall": null
+      }
+    },
+    {
+      "level": "L2",
+      "question": "加班可以换工资吗？",
+      "answer": "加班可以换工资，但优先安排调休。如果确实无法调休，才会按照公司规定的加班费标准支付加班工资。",
+      "reference": "优先安排调休，无法调休时按加班费标准支付（工作日1.5倍、周末2倍、节假日3倍）。",
+      "contexts_count": 0,
+      "trace_id": null,
+      "duration_ms": 2941,
+      "error": null,
+      "metrics": {
+        "faithfulness": null,
+        "answer_relevancy": null,
+        "context_precision": null,
+        "context_recall": null
+      }
+    },
+    {
+      "level": "L2",
+      "question": "可以申请弹性工作吗？",
+      "answer": "申请弹性工作需要满足一定条件并完成相应流程。\n\n### 一、申请条件\n\n- **入职满3个月**\n- **绩效评分达到B级及以上**\n- 所在岗位属于可申请范围，需经**部门负责人审批同意**\n\n### 二、弹性工作规则\n\n- 每日**上班时间可在9:00至9:30之间选择**\n- 下班时间根据上班时间相应调整，范围为**17:30至18:30**\n- 选定的时间安排需**连续执行至少3个月**，...",
+      "reference": "入职满3个月、绩效B及以上可申请。登录OA系统提交申请，选择上班时间（9:00或9:30）。",
+      "contexts_count": 0,
+      "trace_id": null,
+      "duration_ms": 5426,
+      "error": null,
+      "metrics": {
+        "faithfulness": null,
+        "answer_relevancy": null,
+        "context_precision": null,
+        "context_recall": null
+      }
+    },
+    {
+      "level": "L2",
+      "question": "试用期工资怎么算？",
+      "answer": "试用期工资按转正后工资的80%计算，且不得低于当地最低工资标准。工资于每月15日发放，支付的是上月整月的工资。\n\n此外，试用期员工可享受与转正员工相同的餐补待遇，为30元/天。",
+      "reference": "试用期工资 = 转正工资 × 80%，餐补、交通补贴、通讯补贴正常发放。",
+      "contexts_count": 0,
+      "trace_id": null,
+      "duration_ms": 3548,
+      "error": null,
+      "metrics": {
+        "faithfulness": null,
+        "answer_relevancy": null,
+        "context_precision": null,
+        "context_recall": null
+      }
+    },
+    {
+      "level": "L2",
+      "question": "社保可以断缴吗？",
+      "answer": "未检索到与问题相关的文档内容。",
+      "reference": "不可以，断缴影响看病报销、买房、落户等。如离职当月减员，新单位入职后续交。",
+      "contexts_count": 0,
+      "trace_id": null,
+      "duration_ms": 1687,
+      "error": null,
+      "metrics": {
+        "faithfulness": null,
+        "answer_relevancy": null,
+        "context_precision": null,
+        "context_recall": null
+      }
+    },
+    {
+      "level": "L2",
+      "question": "住宿超标可以报销吗？",
+      "answer": "住宿超标部分一般不予报销，需员工自行承担。\n\n**特殊情况处理：**\n如果因当地无合规酒店、重大会议期间房价上涨等特殊原因导致超标，必须在出差申请阶段提前说明，并获得相关审批。报销时需附上特批记录，方可按特殊流程处理。\n\n其中，若住宿费用超过标准50%以上，还需总监层级审批同意。\n\n总之，未经事先批准的超标部分一律自理。",
+      "reference": "超标部分自理，特殊情况需提前申请并获批准。",
+      "contexts_count": 0,
+      "trace_id": null,
+      "duration_ms": 4756,
+      "error": null,
+      "metrics": {
+        "faithfulness": null,
+        "answer_relevancy": null,
+        "context_precision": null,
+        "context_recall": null
+      }
+    },
+    {
+      "level": "L2",
+      "question": "超期发票能报销吗？",
+      "answer": "未检索到与问题相关的文档内容。",
+      "reference": "不能，发票有效期30天，跨期不予报销。",
+      "contexts_count": 0,
+      "trace_id": null,
+      "duration_ms": 2719,
+      "error": null,
+      "metrics": {
+        "faithfulness": null,
+        "answer_relevancy": null,
+        "context_precision": null,
+        "context_recall": null
+      }
+    },
+    {
+      "level": "L3",
+      "question": "入职满1年但不满3年，年假有多少天？",
+      "answer": "未检索到与问题相关的文档内容。",
+      "reference": "入职满1年享5天，以后每满1年增加：满3年10天，所以是10天。",
+      "contexts_count": 0,
+      "trace_id": null,
+      "duration_ms": 3413,
+      "error": null,
+      "metrics": {
+        "faithfulness": null,
+        "answer_relevancy": null,
+        "context_precision": null,
+        "context_recall": null
+      }
+    },
+    {
+      "level": "L3",
+      "question": "试用期请年假会被批准吗？",
+      "answer": "试用期员工没有年假，因此无法请年假。\n\n根据公司规定，年假需入职满一年后才能享有，试用期期间不累计年假天数。即使后续转正，年假也会按照转正当天起算，满一年后方可使用。",
+      "reference": "试用期按转正天数折算，实际入职满1年才有年假，所以试用期没有年假。",
+      "contexts_count": 0,
+      "trace_id": null,
+      "duration_ms": 3669,
+      "error": null,
+      "metrics": {
+        "faithfulness": null,
+        "answer_relevancy": null,
+        "context_precision": null,
+        "context_recall": null
+      }
+    },
+    {
+      "level": "L3",
+      "question": "3月15日入职，当月工资怎么算？",
+      "answer": "未检索到与问题相关的文档内容。",
+      "reference": "15日后入职按实际出勤计算，即(实际工作日/应工作日)×月工资。",
+      "contexts_count": 0,
+      "trace_id": null,
+      "duration_ms": 4802,
+      "error": null,
+      "metrics": {
+        "faithfulness": null,
+        "answer_relevancy": null,
+        "context_precision": null,
+        "context_recall": null
+      }
+    },
+    {
+      "level": "L3",
+      "question": "离职时年假没休完怎么办？",
+      "answer": "离职时年假没休完的处理办法，主要取决于公司制度对年假结转和清零的规定。根据现有信息：\n\n**年假一般以自然年为核算周期**，未用完的年假是否能结转、能结转多少天，由公司政策具体规定。\n\n通常有两种处理方式：\n- **不结转**：当年未休完的年假在12月31日清零；\n- **可结转**：最多结转一定天数（如X天）至次年，须在次年6月30日前使用完毕，逾期自动清零。\n\n> 注：以上规则主要针对在职员工...",
+      "reference": "未休年假按日工资的3倍折算，随最后一个月工资发放。",
+      "contexts_count": 0,
+      "trace_id": null,
+      "duration_ms": 6478,
+      "error": null,
+      "metrics": {
+        "faithfulness": null,
+        "answer_relevancy": null,
+        "context_precision": null,
+        "context_recall": null
+      }
+    },
+    {
+      "level": "L3",
+      "question": "培训协议服务期未满离职怎么处理？",
+      "answer": "如果员工在培训协议约定的服务期内离职，需要按比例退还尚未履行服务期对应的培训费用。\n\n公司会在离职时根据实际未满的服务期限进行计算，员工需偿还相应部分的培训成本。其他工资和未休年假等权益会在最后工作日一并结清。",
+      "reference": "需按比例退还培训费用（服务期未满部分）。",
+      "contexts_count": 0,
+      "trace_id": null,
+      "duration_ms": 3469,
+      "error": null,
+      "metrics": {
+        "faithfulness": null,
+        "answer_relevancy": null,
+        "context_precision": null,
+        "context_recall": null
+      }
+    },
+    {
+      "level": "L3",
+      "question": "发现信息泄露但不确定严重程度，应该先联系谁？",
+      "answer": "关于数据安全，在知识库中检索到了以下内容：\r\n1) OA系统\n2) 保险系统\r\n\r\n请问你具体想了解哪个？请回复数字选择（可多选，如 1,2），或回复“都/全部”",
+      "reference": "立即报告IT安全和HR部门，采取止损措施，配合调查。",
+      "contexts_count": 0,
+      "trace_id": null,
+      "duration_ms": 2951,
+      "error": null,
+      "metrics": {
+        "faithfulness": null,
+        "answer_relevancy": null,
+        "context_precision": null,
+        "context_recall": null
+      }
+    }
+  ]
+}

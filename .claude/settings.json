@@ -11,10 +11,14 @@
       "Read(//d/apache-maven-3.9.15/bin/**)",
       "Read(//c/apache-maven-3.9.15/bin/**)",
       "Bash(where mvn *)",
-      "Bash(\"D:/apache-maven-3.9.15/bin/mvn\" compile *)"
+      "Bash(\"D:/apache-maven-3.9.15/bin/mvn\" compile *)",
+      "Bash(pip show *)",
+      "Bash(python scripts/rag_evaluator.py)",
+      "Bash(python -c ' *)"
     ],
     "additionalDirectories": [
-      "D:\\apache-maven-3.9.15\\conf"
+      "D:\\apache-maven-3.9.15\\conf",
+      "d:\\Desktop\\学习开发\\RagKnowledgeSystem\\docs"
     ]
   }
 }
