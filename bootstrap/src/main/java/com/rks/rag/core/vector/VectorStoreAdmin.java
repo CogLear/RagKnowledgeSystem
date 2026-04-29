@@ -44,4 +44,11 @@ public interface VectorStoreAdmin {
      * 只判断存在性（不创建）
      */
     boolean vectorSpaceExists(VectorSpaceId spaceId);
+
+    /**
+     * 删除向量空间
+     *
+     * @param spaceId 向量空间ID
+     */
+    void dropVectorSpace(VectorSpaceId spaceId);
 }

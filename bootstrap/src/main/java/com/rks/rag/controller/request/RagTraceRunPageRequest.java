@@ -1,8 +1,7 @@
-
-
 package com.rks.rag.controller.request;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.rks.rag.dao.entity.RagTraceRunDO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -17,7 +16,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class RagTraceRunPageRequest extends Page {
+public class RagTraceRunPageRequest extends Page<RagTraceRunDO> {
 
     private String traceId;
 

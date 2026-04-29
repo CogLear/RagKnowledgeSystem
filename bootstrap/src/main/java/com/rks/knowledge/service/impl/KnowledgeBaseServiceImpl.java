@@ -30,6 +30,7 @@ import org.springframework.util.StringUtils;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.BucketAlreadyExistsException;
 import software.amazon.awssdk.services.s3.model.BucketAlreadyOwnedByYouException;
+import software.amazon.awssdk.services.s3.model.DeleteBucketRequest;
 
 import java.util.HashMap;
 import java.util.List;
@@ -234,14 +235,16 @@ public class KnowledgeBaseServiceImpl implements KnowledgeBaseService {
      * 删除知识库
      *
      * <p>
-     * 删除知识库记录，但不删除关联的 S3 存储桶和 Milvus 向量空间。
+     * 删除知识库及其关联的所有资源：MySQL 记录、S3 存储桶、Milvus 向量空间。
      * 删除前必须确保没有关联的文档。
      * </p>
      *
      * <h2>执行流程</h2>
      * <ol>
      *   <li><b>关联检查</b>：检查是否有文档关联到此知识库</li>
-     *   <li><b>逻辑删除</b>：将数据库记录标记为删除（deleted = 1）</li>
+     *   <li><b>删除 S3 存储桶</b>：清理存储的原始文件</li>
+     *   <li><b>删除 Milvus 向量空间</b>：清理向量索引</li>
+     *   <li><b>删除数据库记录</b>：执行软删除（deleted = 1）</li>
      * </ol>
      *
      * <h2>删除限制</h2>
@@ -252,9 +255,9 @@ public class KnowledgeBaseServiceImpl implements KnowledgeBaseService {
      *
      * <h2>资源清理</h2>
      * <ul>
-     *   <li><b>MySQL</b>：标记删除（软删除）</li>
-     *   <li><b>S3</b>：不清理（文档删除时清理）</li>
-     *   <li><b>Milvus</b>：不清理（文档删除时清理）</li>
+     *   <li><b>MySQL</b>：软删除记录</li>
+     *   <li><b>S3</b>：删除存储桶及其所有对象</li>
+     *   <li><b>Milvus</b>：删除向量空间（collection）</li>
      * </ul>
      *
      * @param kbId 知识库ID
@@ -272,9 +275,48 @@ public class KnowledgeBaseServiceImpl implements KnowledgeBaseService {
             throw new ClientException("知识库下仍有关联文档，无法删除");
         }
 
-        // ========== 步骤2：执行删除 ==========
+        // ========== 步骤2：获取知识库信息 ==========
+        KnowledgeBaseDO kb = knowledgeBaseMapper.selectById(kbId);
+        if (kb == null || (kb.getDeleted() != null && kb.getDeleted() == 1)) {
+            throw new ClientException("知识库不存在");
+        }
+        String collectionName = kb.getCollectionName();
+
+        // ========== 步骤3：删除 S3 存储桶 ==========
+        try {
+            deleteS3Bucket(collectionName);
+        } catch (Exception e) {
+            log.warn("删除S3存储桶失败，bucket={}, error={}", collectionName, e.getMessage());
+        }
+
+        // ========== 步骤4：删除 Milvus 向量空间 ==========
+        try {
+            VectorSpaceId spaceId = VectorSpaceId.builder().logicalName(collectionName).build();
+            vectorStoreAdmin.dropVectorSpace(spaceId);
+        } catch (Exception e) {
+            log.warn("删除Milvus向量空间失败，collection={}, error={}", collectionName, e.getMessage());
+        }
+
+        // ========== 步骤5：执行数据库删除 ==========
         // 执行软删除（设置 deleted = 1）
         knowledgeBaseMapper.deleteById(kbId);
+        log.info("知识库删除成功，kbId={}, collection={}", kbId, collectionName);
+    }
+
+    /**
+     * 删除 S3 存储桶及其所有对象
+     */
+    private void deleteS3Bucket(String bucketName) {
+        // 1. 删除存储桶中的所有对象
+        s3Client.listObjectsV2Paginator(builder -> builder.bucket(bucketName))
+                .forEach(page -> page.contents().forEach(obj -> {
+                    s3Client.deleteObject(builder -> builder.bucket(bucketName).key(obj.key()));
+                    log.debug("删除S3对象，bucket={}, key={}", bucketName, obj.key());
+                }));
+
+        // 2. 删除存储桶
+        s3Client.deleteBucket(builder -> builder.bucket(bucketName));
+        log.info("删除S3存储桶成功，bucket={}", bucketName);
     }
 
     @Override
