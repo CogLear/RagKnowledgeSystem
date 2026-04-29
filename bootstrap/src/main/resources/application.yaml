@@ -150,6 +150,9 @@ ai:
         model: qwen3-embedding:8b-fp16
         dimension: 4096
         priority: 2
+    cache:
+      enabled: true
+      redis-cache-ttl-days: 7
 
   rerank:
     default-model: gte-rerank-v2

@@ -8,6 +8,8 @@ import com.rks.infra.model.ModelHealthStore;
 import com.rks.infra.model.ModelRoutingExecutor;
 import com.rks.infra.model.ModelSelector;
 import com.rks.infra.model.ModelTarget;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -52,6 +54,7 @@ import java.util.stream.Collectors;
  * @see EmbeddingClient
  * @see ModelRoutingExecutor
  */
+@Slf4j
 @Service
 @Primary
 public class RoutingEmbeddingService implements EmbeddingService {
@@ -64,6 +67,12 @@ public class RoutingEmbeddingService implements EmbeddingService {
     private final ModelRoutingExecutor executor;
     /** 提供商到客户端的映射 */
     private final Map<String, EmbeddingClient> clientsByProvider;
+    /** Embedding 缓存管理器 */
+    private final EmbeddingCacheManager cacheManager;
+    /** 是否启用缓存 */
+    private final boolean cacheEnabled;
+    /** Redis 缓存 TTL（天） */
+    private final long cacheTtlDays;
 
     /**
      * 构造函数
@@ -72,17 +81,24 @@ public class RoutingEmbeddingService implements EmbeddingService {
      * @param healthStore 模型健康状态存储器
      * @param executor   模型路由执行器
      * @param clients    所有注册的 EmbeddingClient 实现列表
+     * @param cacheManager Embedding 缓存管理器
      */
     public RoutingEmbeddingService(
             ModelSelector selector,
             ModelHealthStore healthStore,
             ModelRoutingExecutor executor,
-            List<EmbeddingClient> clients) {
+            List<EmbeddingClient> clients,
+            EmbeddingCacheManager cacheManager,
+            @Value("${ai.embedding.cache.enabled:true}") boolean cacheEnabled,
+            @Value("${ai.embedding.cache.redis-cache-ttl-days:7}") long cacheTtlDays) {
         this.selector = selector;
         this.healthStore = healthStore;
         this.executor = executor;
         this.clientsByProvider = clients.stream()
                 .collect(Collectors.toMap(EmbeddingClient::provider, Function.identity()));
+        this.cacheManager = cacheManager;
+        this.cacheEnabled = cacheEnabled;
+        this.cacheTtlDays = cacheTtlDays;
     }
 
     /**
@@ -99,12 +115,29 @@ public class RoutingEmbeddingService implements EmbeddingService {
      */
     @Override
     public List<Float> embed(String text) {
-        return executor.executeWithFallback(
+        String modelId = selector.selectDefaultEmbedding() != null
+                ? selector.selectDefaultEmbedding().id() : "default";
+
+        if (cacheEnabled) {
+            List<Float> cached = cacheManager.get(text, modelId);
+            if (cached != null) {
+                log.debug("Embedding 缓存命中, text长度={}", text.length());
+                return cached;
+            }
+        }
+
+        List<Float> result = executor.executeWithFallback(
                 ModelCapability.EMBEDDING,
                 selector.selectEmbeddingCandidates(),
                 target -> clientsByProvider.get(target.candidate().getProvider()),
                 (client, target) -> client.embed(text, target)
         );
+
+        if (cacheEnabled && result != null) {
+            cacheManager.put(text, modelId, result, cacheTtlDays);
+        }
+
+        return result;
     }
 
     /**
@@ -122,6 +155,14 @@ public class RoutingEmbeddingService implements EmbeddingService {
      */
     @Override
     public List<Float> embed(String text, String modelId) {
+        if (cacheEnabled) {
+            List<Float> cached = cacheManager.get(text, modelId);
+            if (cached != null) {
+                log.debug("Embedding 缓存命中, text长度={}, modelId={}", text.length(), modelId);
+                return cached;
+            }
+        }
+
         // 解析目标模型
         ModelTarget target = resolveTarget(modelId);
         // 解析客户端
@@ -137,6 +178,11 @@ public class RoutingEmbeddingService implements EmbeddingService {
             List<Float> vector = client.embed(text, target);
             // 成功，标记健康状态
             healthStore.markSuccess(target.id());
+
+            if (cacheEnabled) {
+                cacheManager.put(text, modelId, vector, cacheTtlDays);
+            }
+
             return vector;
         } catch (Exception e) {
             // 失败，标记失败（可能触发断路器）
