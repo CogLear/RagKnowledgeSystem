@@ -31,6 +31,8 @@ import com.rks.knowledge.service.KnowledgeChunkService;
 import com.rks.rag.core.vector.VectorStoreService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -74,6 +76,9 @@ public class KnowledgeChunkServiceImpl implements KnowledgeChunkService {
     private final EmbeddingService embeddingService;
     private final TokenCounterService tokenCounterService;
     private final VectorStoreService vectorStoreService;
+    private final RedissonClient redissonClient;
+
+    private static final String CHUNK_INDEX_LOCK_PREFIX = "chunk:index:lock:";
 
     /**
      * 检查文档是否存在 Chunk
@@ -140,19 +145,24 @@ public class KnowledgeChunkServiceImpl implements KnowledgeChunkService {
 
         Integer chunkIndex = requestParam.getIndex();
         if (chunkIndex == null) {
-            // 自动取当前最大值 + 1
-            int maxIndex = chunkMapper.selectOne(
-                    new LambdaQueryWrapper<KnowledgeChunkDO>()
-                            .eq(KnowledgeChunkDO::getDocId, docId)
-                            .orderByDesc(KnowledgeChunkDO::getChunkIndex)
-                            .last("LIMIT 1")
-            ) != null ? chunkMapper.selectOne(
-                    new LambdaQueryWrapper<KnowledgeChunkDO>()
-                            .eq(KnowledgeChunkDO::getDocId, docId)
-                            .orderByDesc(KnowledgeChunkDO::getChunkIndex)
-                            .last("LIMIT 1")
-            ).getChunkIndex() : -1;
-            chunkIndex = maxIndex + 1;
+            // 使用分布式锁保证索引分配原子性
+            String lockKey = CHUNK_INDEX_LOCK_PREFIX + docId;
+            RLock lock = redissonClient.getLock(lockKey);
+            try {
+                lock.lock();
+                // 重新查询最大值（锁内执行）
+                KnowledgeChunkDO latest = chunkMapper.selectOne(
+                        new LambdaQueryWrapper<KnowledgeChunkDO>()
+                                .eq(KnowledgeChunkDO::getDocId, docId)
+                                .orderByDesc(KnowledgeChunkDO::getChunkIndex)
+                                .last("LIMIT 1")
+                );
+                chunkIndex = latest != null && latest.getChunkIndex() != null ? latest.getChunkIndex() + 1 : 0;
+            } finally {
+                if (lock.isHeldByCurrentThread()) {
+                    lock.unlock();
+                }
+            }
         }
 
         String contentHash = calculateHash(content);
@@ -217,6 +227,23 @@ public class KnowledgeChunkServiceImpl implements KnowledgeChunkService {
         Assert.notNull(documentDO, () -> new ClientException("文档不存在"));
 
         boolean needAutoIndex = requestParams.stream().anyMatch(request -> request.getIndex() == null);
+
+        // 使用分布式锁保证索引分配原子性，防止并发竞态条件
+        String lockKey = CHUNK_INDEX_LOCK_PREFIX + docId;
+        RLock lock = redissonClient.getLock(lockKey);
+        try {
+            lock.lock();
+            doBatchCreateWithLock(docId, documentDO, requestParams, needAutoIndex, writeVector);
+        } finally {
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
+        }
+    }
+
+    private void doBatchCreateWithLock(String docId, KnowledgeDocumentDO documentDO,
+                                        List<KnowledgeChunkCreateRequest> requestParams,
+                                        boolean needAutoIndex, boolean writeVector) {
         int nextIndex = 0;
         if (needAutoIndex) {
             KnowledgeChunkDO latest = chunkMapper.selectOne(
