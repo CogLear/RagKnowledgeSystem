@@ -46,6 +46,11 @@ rag:
     max-history-messages: 4
     max-history-chars: 500
 
+  cache:
+    retrieval:
+      enabled: true
+      ttl-minutes: 10
+
   rate-limit:
     global:
       enabled: true

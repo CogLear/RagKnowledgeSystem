@@ -82,12 +82,18 @@ public class EmbeddingCacheManager {
      */
     public List<Float> get(String text, String modelId) {
         String key = buildCacheKey(text, modelId);
-        try {
-            return localCache.get(key);
-        } catch (Exception e) {
-            log.warn("从本地缓存获取 embedding 失败, key={}", key, e);
-            return getFromRedisOnly(key);
+        // 先检查 L1 本地缓存
+        List<Float> cached = localCache.getIfPresent(key);
+        if (cached != null) {
+            return cached;
         }
+        // L1 未命中，尝试 L2 Redis
+        List<Float> result = getFromRedisOnly(key);
+        if (result != null) {
+            // 写入 L1 本地缓存
+            localCache.put(key, result);
+        }
+        return result;
     }
 
     /**

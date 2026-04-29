@@ -121,7 +121,7 @@ public class RoutingEmbeddingService implements EmbeddingService {
         if (cacheEnabled) {
             List<Float> cached = cacheManager.get(text, modelId);
             if (cached != null) {
-                log.debug("Embedding 缓存命中, text长度={}", text.length());
+                log.info("Embedding 缓存命中, text长度={}", text.length());
                 return cached;
             }
         }
@@ -158,7 +158,7 @@ public class RoutingEmbeddingService implements EmbeddingService {
         if (cacheEnabled) {
             List<Float> cached = cacheManager.get(text, modelId);
             if (cached != null) {
-                log.debug("Embedding 缓存命中, text长度={}, modelId={}", text.length(), modelId);
+                log.info("Embedding 缓存命中, text长度={}, modelId={}", text.length(), modelId);
                 return cached;
             }
         }

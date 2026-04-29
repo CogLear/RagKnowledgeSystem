@@ -1,28 +1,90 @@
 # RAG 系统优化建议
 
-## 一、缓存优化
-
-### 1.1 向量嵌入缓存
-
-**现状**: 每次检索都实时计算查询的 embedding，没有缓存。
-
-**优化方案**: 增加 Redis 向量缓存层
+## 一、RAG 完整架构概览
 
 ```
-Key 格式: rag:embed:{hash(query)}
-Value: float[] embedding向量
-TTL: 1小时（可配置）
+┌─────────────────────────────────────────────────────────────────┐
+│                         User Query                              │
+└─────────────────────────────┬───────────────────────────────────┘
+                              │
+                      ┌───────▼───────┐
+                      │   Query       │ ←─ 历史上下文压缩
+                      │   Rewrite     │
+                      └───────┬───────┘
+                              │
+                      ┌───────▼───────┐
+                      │   Intent     │ ←─ 意图分类 + 树缓存 (L1+L2)
+                      │   Resolver   │
+                      └───────┬───────┘
+                              │
+            ┌─────────────────┼─────────────────┐
+            │                 │                 │
+       ┌────▼────┐       ┌────▼────┐       ┌────▼────┐
+       │   KB    │       │   MCP   │       │ System  │
+       │ Intent  │       │  Tools  │       │ Intent  │
+       └────┬────┘       └─────────┘       └─────────┘
+            │
+    ┌───────▼───────────────────────────────────┐
+    │           Retrieval Engine                 │
+    │  ┌─────────┐  ┌─────────┐  ┌─────────┐   │
+    │  │ Hybrid  │  │  ReRank │  │ DeDupe  │   │
+    │  │ Search  │  │        │  │         │   │
+    │  └────┬────┘  └────┬────┘  └────┬────┘   │
+    │       │            │            │         │
+    │  ┌────▼────────────▼────────────▼────┐   │
+    │  │    RetrievalContext Cache          │   │
+    │  └────────────────────────────────────┘   │
+    └────────────────────┬──────────────────────┘
+                         │
+                 ┌───────▼───────┐
+                 │    Prompt     │ ←─ 模板缓存
+                 │    Builder    │
+                 └───────┬───────┘
+                         │
+                 ┌───────▼───────┐
+                 │      LLM      │ ←─ 路由 + 熔断
+                 └───────┬───────┘
+                         │
+                        Stream/SSE
 ```
 
-**收益**:
-- 相同/相似问题重复检索时，直接命中缓存，延迟降低 50%+
-- 减少 embedding 服务调用次数，降低 API 成本
+### 当前系统已有组件
 
-**实现位置**: `EmbeddingClient` 或 `MilvusRetrieverService`
+| 层级 | 组件 | 状态 |
+|-----|------|-----|
+| **文档处理** | 分块 (FixedSize/Paragraph/Sentence/StructureAware) | ✅ |
+| **向量化** | Embedding (SiliconFlow/Ollama 双路由) | ✅ |
+| **向量存储** | Milvus (HNSW 索引) | ✅ |
+| **检索** | 多渠道检索 (IntentDirected + VectorGlobal) | ✅ |
+| **意图理解** | 意图树分类 (L1+L2 缓存) | ✅ |
+| **查询改写** | QueryRewrite + 历史压缩 | ✅ |
+| **记忆管理** | ConversationMemory (MySQL 存储) | ✅ |
+| **提示构建** | RAGPromptService (结构化上下文) | ✅ |
+| **生成** | LLM 路由 (Bailian/SiliconFlow/Ollama) | ✅ |
+| **工具调用** | MCP 协议支持 | ✅ |
+| **缓存** | 向量嵌入缓存 (L1+L2) | ✅ 已实现 |
 
 ---
 
-### 1.2 检索结果缓存
+## 二、缓存优化
+
+### 2.1 向量嵌入缓存
+
+**状态**: ✅ 已实现
+
+```
+Key 格式: ragent:embedding:{SHA256(text|"modelId")[:16]}
+L1: Guava LoadingCache (容量1000, 5分钟过期)
+L2: Redis (可配置TTL, 默认7天)
+```
+
+**实现文件**:
+- `infra-ai/.../embedding/EmbeddingCacheManager.java` - 缓存管理器
+- `infra-ai/.../embedding/RoutingEmbeddingService.java` - 缓存逻辑注入
+
+---
+
+### 2.2 检索结果缓存
 
 **现状**: 每次对话请求都执行完整的检索流程。
 
@@ -42,7 +104,7 @@ TTL: 5-15分钟（知识库更新频率决定）
 
 ---
 
-### 1.3 意图树缓存增强
+### 2.3 意图树缓存增强
 
 **现状**: 已有 L1 (Guava) + L2 (Redis) 两级缓存。
 
@@ -53,9 +115,9 @@ TTL: 5-15分钟（知识库更新频率决定）
 
 ---
 
-## 二、检索性能优化
+## 三、检索性能优化
 
-### 2.1 Milvus Search 参数调优
+### 3.1 Milvus Search 参数调优
 
 **现状**: `ef=128` 硬编码
 
@@ -73,7 +135,7 @@ milvus:
 
 ---
 
-### 2.2 集合并行检索优化
+### 3.2 集合并行检索优化
 
 **现状**: 全局搜索时每次都从 MySQL 查询所有 KB 集合列表。
 
@@ -86,7 +148,7 @@ milvus:
 
 ---
 
-### 2.3 低分结果过滤与扩展搜索
+### 3.3 低分结果过滤与扩展搜索
 
 **现状**: 代码中有 TODO 注释但未实现。
 
@@ -109,7 +171,7 @@ rag:
 
 ---
 
-### 2.4 批量检索合并
+### 3.4 批量检索合并
 
 **现状**: 多渠道并行检索后独立处理结果。
 
@@ -117,9 +179,9 @@ rag:
 
 ---
 
-## 三、分块策略优化
+## 四、分块策略优化
 
-### 3.1 动态分块大小
+### 4.1 动态分块大小
 
 **现状**: 固定分块大小 (FIXED_SIZE)
 
@@ -135,7 +197,7 @@ rag:
 
 ---
 
-### 3.2 语义分块增强
+### 4.2 语义分块增强
 
 **现状**: 主要基于文本边界（段落、句子）分块。
 
@@ -146,9 +208,9 @@ rag:
 
 ---
 
-## 四、查询改写优化
+## 五、查询改写优化
 
-### 4.1 历史上下文压缩
+### 5.1 历史上下文压缩
 
 **现状**: 使用固定的历史消息数和字符数限制。
 
@@ -165,7 +227,7 @@ if (historyChars > maxHistoryChars) {
 
 ---
 
-### 4.2 多语言查询处理
+### 5.2 多语言查询处理
 
 **现状**: 可能缺乏跨语言检索支持。
 
@@ -173,9 +235,9 @@ if (historyChars > maxHistoryChars) {
 
 ---
 
-## 五、系统稳定性优化
+## 六、系统稳定性优化
 
-### 5.1 Milvus 写入重试机制
+### 6.1 Milvus 写入重试机制
 
 **现状**: Milvus 写入失败无重试。
 
@@ -195,7 +257,7 @@ public void syncChunkToMilvus(Chunk chunk) {
 
 ---
 
-### 5.2 Embedding 服务限流
+### 6.2 Embedding 服务限流
 
 **现状**: 批量 embedding 时无并发限制。
 
@@ -216,7 +278,7 @@ public CompletableFuture<EmbeddingResult> embedAsync(String text) {
 
 ---
 
-### 5.3 检索超时控制
+### 6.3 检索超时控制
 
 **优化方案**: 为 Milvus 搜索添加超时
 
@@ -230,9 +292,9 @@ milvusClient = MilvusServiceClient.builder()
 
 ---
 
-## 六、召回率优化
+## 七、召回率优化
 
-### 6.1 混合检索
+### 7.1 混合检索
 
 **现状**: 仅使用向量检索。
 
@@ -243,9 +305,13 @@ milvusClient = MilvusServiceClient.builder()
 double finalScore = 0.7 * vectorScore + 0.3 * bm25Score;
 ```
 
+**收益**:
+- 关键词精确匹配提升召回
+- 弥补向量检索对专有名词不敏感的缺点
+
 ---
 
-### 6.2 查询扩展 (Query Expansion)
+### 7.2 查询扩展 (Query Expansion)
 
 **优化方案**:
 1. 使用 LLM 生成查询的同义词扩展
@@ -254,7 +320,7 @@ double finalScore = 0.7 * vectorScore + 0.3 * bm25Score;
 
 ---
 
-### 6.3 重排序模型优化
+### 7.3 重排序模型优化
 
 **现状**: 已有 `RerankPostProcessor`
 
@@ -265,9 +331,9 @@ double finalScore = 0.7 * vectorScore + 0.3 * bm25Score;
 
 ---
 
-## 七、监控与可观测性
+## 八、监控与可观测性
 
-### 7.1 关键指标
+### 8.1 关键指标
 
 建议增加以下监控指标:
 
@@ -279,7 +345,7 @@ double finalScore = 0.7 * vectorScore + 0.3 * bm25Score;
 | `rag.retrieval.score.avg` | 平均检索分数 | < 0.6 |
 | `rag.milvus.error_rate` | Milvus 错误率 | > 1% |
 
-### 7.2 日志优化
+### 8.2 日志优化
 
 ```java
 // 结构化日志，便于 ELK 分析
@@ -293,26 +359,132 @@ log.info("RAG retrieval completed",
 
 ---
 
-## 八、优先级建议
+## 九、知识库管理增强
 
-按实施难度和收益综合排序:
+### 9.1 增量索引
 
-| 优先级 | 优化项 | 难度 | 收益 | 建议 |
-|-------|--------|------|------|------|
-| P0 | 向量嵌入缓存 | 低 | 高 | 快速实现 |
-| P0 | Milvus 超时与重试 | 低 | 高 | 必做 |
-| P1 | 检索结果缓存 | 中 | 高 | 核心链路优化 |
-| P1 | 低分过滤与扩展搜索 | 低 | 中 | 快速实现 |
-| P2 | 混合检索 | 高 | 高 | 长期规划 |
-| P2 | 查询扩展 | 中 | 中 | 按需实施 |
-| P3 | 动态分块 | 高 | 中 | 长期规划 |
-| P3 | 监控指标 | 中 | 中 | 运维必备 |
+**现状**: 文档更新时需全量重建索引。
+
+**优化方案**:
+- 记录文档版本号/变更时间戳
+- 仅索引变更的文档块
+- 后台定时增量同步
+
+### 9.2 知识库版本管理
+
+**优化方案**:
+- 支持知识库快照
+- 支持回滚到历史版本
+- 版本对比功能
+
+### 9.3 冷热数据分离
+
+```
+热数据: 最近30天访问的知识 → Milvus 高性能集群
+冷数据: 历史知识 → 归档存储，访问时按需加载
+```
 
 ---
 
-## 九、配置参考
+## 十、RAG 评估体系
 
-建议在 `application.yaml` 中新增配置节:
+### 10.1 评估指标 (RAGAS 风格)
+
+| 指标 | 说明 | 计算方式 |
+|-----|------|---------|
+| **Faithfulness** | 答案对检索内容的忠诚度 | 答案中能从检索内容推断出的陈述比例 |
+| **Answer Relevancy** | 答案与问题的相关性 | 答案与问题的语义相似度 |
+| **Context Precision** | 检索内容的相关性排序 | top-K 结果中相关项的排名加权 |
+| **Context Recall** | 检索召回率 | 检索内容覆盖标准答案的程度 |
+
+### 10.2 评估数据集
+
+```
+# 构建评估数据集
+- 人工标注的高质量 Q&A 对
+- 预期检索的文档片段
+- 评分标准定义
+```
+
+### 10.3 自动化评估流程
+
+```yaml
+# 定期评估任务
+evaluation:
+  schedule: "0 2 * * *"  # 每天凌晨2点
+  metrics:
+    - faithfulness
+    - answer_relevancy
+    - context_precision
+    - context_recall
+  alert:
+    threshold: 0.7  # 低于0.7告警
+```
+
+---
+
+## 十一、优先级建议
+
+按实施难度和收益综合排序:
+
+| 优先级 | 优化项 | 难度 | 收益 | 状态 |
+|-------|--------|------|------|------|
+| P0 | 向量嵌入缓存 | 低 | 高 | ✅ 已完成 |
+| P0 | Milvus 超时与重试 | 低 | 高 | 待实施 |
+| P1 | 检索结果缓存 | 中 | 高 | 待实施 |
+| P1 | 低分过滤与扩展搜索 | 低 | 中 | 待实施 |
+| P2 | 混合检索 | 高 | 高 | 长期规划 |
+| P2 | 查询扩展 | 中 | 中 | 待实施 |
+| P3 | 动态分块 | 高 | 中 | 长期规划 |
+| P3 | 监控指标 | 中 | 中 | 待实施 |
+| P3 | 知识库版本管理 | 中 | 中 | 长期规划 |
+| P3 | RAG 评估体系 | 高 | 中 | 长期规划 |
+
+---
+
+## 十二、配置参考
+
+当前 `application.yaml` 中的 RAG 相关配置:
+
+```yaml
+ai:
+  embedding:
+    default-model: qwen-emb-8b
+    candidates:
+      - id: qwen-emb-8b
+        provider: siliconflow
+        model: Qwen/Qwen3-Embedding-8B
+        dimension: 4096
+        priority: 1
+      - id: qwen-emb-local
+        provider: ollama
+        model: qwen3-embedding:8b-fp16
+        dimension: 4096
+        priority: 2
+    cache:
+      enabled: true                    # ✅ 已实现
+      redis-cache-ttl-days: 7         # ✅ 已实现
+
+rag:
+  default:
+    collection-name: rag_default_store
+    dimension: 4096
+    metric-type: COSINE
+  query-rewrite:
+    enabled: true
+    max-history-messages: 4
+    max-history-chars: 500
+  search:
+    channels:
+      vector-global:
+        confidence-threshold: 0.6
+        top-k-multiplier: 3
+      intent-directed:
+        min-intent-score: 0.4
+        top-k-multiplier: 2
+```
+
+建议新增配置节:
 
 ```yaml
 rag:

@@ -15,6 +15,7 @@ import com.rks.rag.dto.SubQuestionIntent;
 import com.rks.rag.enums.IntentKind;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -78,6 +79,12 @@ public class RetrievalEngine {
     private final Executor ragContextExecutor;
     /** MCP 批量执行线程池，用于并行执行多个 MCP 工具调用 */
     private final Executor mcpBatchExecutor;
+    /** 检索结果缓存管理器 */
+    private final RetrievalCacheManager retrievalCacheManager;
+    /** 是否启用检索缓存 */
+    private final boolean retrievalCacheEnabled;
+    /** 检索缓存 TTL（分钟） */
+    private final long retrievalCacheTtlMinutes;
 
     /**
      * 构造函数 - 初始化检索引擎的所有依赖组件
@@ -88,6 +95,7 @@ public class RetrievalEngine {
      * @param multiChannelRetrievalEngine 多通道检索引擎
      * @param ragContextExecutor         RAG 上下文构建专用线程池
      * @param mcpBatchExecutor           MCP 批量执行专用线程池
+     * @param retrievalCacheManager      检索结果缓存管理器
      */
     public RetrievalEngine(
             ContextFormatter contextFormatter,
@@ -95,13 +103,19 @@ public class RetrievalEngine {
             MCPToolRegistry mcpToolRegistry,
             MultiChannelRetrievalEngine multiChannelRetrievalEngine,
             @Qualifier("ragContextThreadPoolExecutor") Executor ragContextExecutor,
-            @Qualifier("mcpBatchThreadPoolExecutor") Executor mcpBatchExecutor) {
+            @Qualifier("mcpBatchThreadPoolExecutor") Executor mcpBatchExecutor,
+            RetrievalCacheManager retrievalCacheManager,
+            @Value("${rag.cache.retrieval.enabled:true}") boolean retrievalCacheEnabled,
+            @Value("${rag.cache.retrieval.ttl-minutes:10}") long retrievalCacheTtlMinutes) {
         this.contextFormatter = contextFormatter;
         this.mcpParameterExtractor = mcpParameterExtractor;
         this.mcpToolRegistry = mcpToolRegistry;
         this.multiChannelRetrievalEngine = multiChannelRetrievalEngine;
         this.ragContextExecutor = ragContextExecutor;
         this.mcpBatchExecutor = mcpBatchExecutor;
+        this.retrievalCacheManager = retrievalCacheManager;
+        this.retrievalCacheEnabled = retrievalCacheEnabled;
+        this.retrievalCacheTtlMinutes = retrievalCacheTtlMinutes;
     }
 
     /**
@@ -145,6 +159,28 @@ public class RetrievalEngine {
                     .build();
         }
 
+        // 尝试从缓存获取（仅对单个子问题场景启用缓存）
+        if (retrievalCacheEnabled && subIntents.size() == 1) {
+            String cacheKey = retrievalCacheManager.buildCacheKey(subIntents.get(0), topK);
+            log.info("检索缓存 Key: {}, subIntents.size()={}", cacheKey, subIntents.size());
+            RetrievalContext cached = retrievalCacheManager.get(cacheKey);
+            if (cached != null) {
+                log.info("检索缓存命中, key={}", cacheKey);
+                return cached;
+            }
+
+            RetrievalContext result = doRetrieve(subIntents, topK);
+            retrievalCacheManager.put(cacheKey, result, retrievalCacheTtlMinutes);
+            return result;
+        }
+
+        return doRetrieve(subIntents, topK);
+    }
+
+    /**
+     * 执行实际检索逻辑
+     */
+    private RetrievalContext doRetrieve(List<SubQuestionIntent> subIntents, int topK) {
         int finalTopK = topK > 0 ? topK : DEFAULT_TOP_K;
         List<CompletableFuture<SubQuestionContext>> tasks = subIntents.stream()
                 .map(si -> CompletableFuture.supplyAsync(

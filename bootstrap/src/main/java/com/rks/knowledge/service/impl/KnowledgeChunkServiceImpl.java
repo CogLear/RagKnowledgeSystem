@@ -28,6 +28,7 @@ import com.rks.knowledge.dao.mapper.KnowledgeBaseMapper;
 import com.rks.knowledge.dao.mapper.KnowledgeChunkMapper;
 import com.rks.knowledge.dao.mapper.KnowledgeDocumentMapper;
 import com.rks.knowledge.service.KnowledgeChunkService;
+import com.rks.rag.core.retrieve.RetrievalCacheManager;
 import com.rks.rag.core.vector.VectorStoreService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -77,6 +78,7 @@ public class KnowledgeChunkServiceImpl implements KnowledgeChunkService {
     private final TokenCounterService tokenCounterService;
     private final VectorStoreService vectorStoreService;
     private final RedissonClient redissonClient;
+    private final RetrievalCacheManager retrievalCacheManager;
 
     private static final String CHUNK_INDEX_LOCK_PREFIX = "chunk:index:lock:";
 
@@ -189,6 +191,9 @@ public class KnowledgeChunkServiceImpl implements KnowledgeChunkService {
 
         chunkMapper.insert(chunkDO);
         log.info("新增 Chunk 成功, kbId={}, docId={}, chunkId={}, chunkIndex={}", documentDO.getKbId(), docId, chunkDO.getId(), chunkIndex);
+
+        // 清除检索缓存
+        retrievalCacheManager.clearAll();
 
         return BeanUtil.toBean(chunkDO, KnowledgeChunkVO.class);
     }
@@ -353,6 +358,9 @@ public class KnowledgeChunkServiceImpl implements KnowledgeChunkService {
         String kbId = String.valueOf(documentDO.getKbId());
         log.info("更新 Chunk 成功, kbId={}, docId={}, chunkId={}", kbId, docId, chunkId);
 
+        // 清除检索缓存
+        retrievalCacheManager.clearAll();
+
         // 同步向量数据库
         vectorStoreService.updateChunk(
                 String.valueOf(chunkDO.getKbId()),
@@ -390,6 +398,9 @@ public class KnowledgeChunkServiceImpl implements KnowledgeChunkService {
 
         String kbId = String.valueOf(documentDO.getKbId());
         log.info("删除 Chunk 成功, kbId={}, docId={}, chunkId={}", kbId, docId, chunkId);
+
+        // 清除检索缓存
+        retrievalCacheManager.clearAll();
 
         deleteChunkFromMilvus(kbId, chunkId);
     }
@@ -429,6 +440,9 @@ public class KnowledgeChunkServiceImpl implements KnowledgeChunkService {
 
         String kbId = String.valueOf(documentDO.getKbId());
         log.info("{}Chunk 成功, kbId={}, docId={}, chunkId={}", enabled ? "启用" : "禁用", kbId, docId, chunkId);
+
+        // 清除检索缓存
+        retrievalCacheManager.clearAll();
 
         if (enabled) {
             syncChunkToMilvus(kbId, docId, chunkDO, resolveEmbeddingModel(documentDO.getKbId()));
@@ -576,6 +590,9 @@ public class KnowledgeChunkServiceImpl implements KnowledgeChunkService {
         vectorStoreService.indexDocumentChunks(kbId, docId, chunks);
 
         log.info("重建文档向量成功, kbId={}, docId={}, chunkCount={}", kbId, docId, enabledChunks.size());
+
+        // 清除检索缓存
+        retrievalCacheManager.clearAll();
     }
 
     // ==================== 私有方法 ====================
@@ -620,6 +637,9 @@ public class KnowledgeChunkServiceImpl implements KnowledgeChunkService {
 
         String kbId = String.valueOf(documentDO.getKbId());
         log.info("批量{}Chunk 成功, kbId={}, docId={}, count={}", enabled ? "启用" : "禁用", kbId, docId, needUpdateIds.size());
+
+        // 清除检索缓存
+        retrievalCacheManager.clearAll();
 
         if (enabled) {
             doRebuildByDocId(docId);

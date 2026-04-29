@@ -231,6 +231,7 @@ D:\Desktop\学习开发\RagKnowledgeSystem\bootstrap\src\main\java\com\rks\rag\c
 D:\Desktop\学习开发\RagKnowledgeSystem\bootstrap\src\main\java\com\rks\rag\core\retrieve\postprocessor\DeduplicationPostProcessor.java
 D:\Desktop\学习开发\RagKnowledgeSystem\bootstrap\src\main\java\com\rks\rag\core\retrieve\postprocessor\RerankPostProcessor.java
 D:\Desktop\学习开发\RagKnowledgeSystem\bootstrap\src\main\java\com\rks\rag\core\retrieve\postprocessor\SearchResultPostProcessor.java
+D:\Desktop\学习开发\RagKnowledgeSystem\bootstrap\src\main\java\com\rks\rag\core\retrieve\RetrievalCacheManager.java
 D:\Desktop\学习开发\RagKnowledgeSystem\bootstrap\src\main\java\com\rks\rag\core\retrieve\RetrievalEngine.java
 D:\Desktop\学习开发\RagKnowledgeSystem\bootstrap\src\main\java\com\rks\rag\core\retrieve\RetrieveRequest.java
 D:\Desktop\学习开发\RagKnowledgeSystem\bootstrap\src\main\java\com\rks\rag\core\retrieve\RetrieverService.java
