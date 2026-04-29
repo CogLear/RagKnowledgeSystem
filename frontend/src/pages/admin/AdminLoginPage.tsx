@@ -67,7 +67,7 @@ export function AdminLoginPage() {
   const { isDark } = useTheme();
   const { login, isLoading } = useAuthStore();
   const [showPassword, setShowPassword] = React.useState(false);
-  const [form, setForm] = React.useState({ username: "admin", password: "admin" });
+  const [form, setForm] = React.useState({ username: "guest", password: "123456" });
   const [error, setError] = React.useState<string | null>(null);
 
   const handleSubmit = async (event: React.FormEvent) => {

@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="94bb44ff-cfc3-4ab9-90c9-10843f4b1508" name="更改" comment="修复批量创建 Chunk 索引分配竞态条件">
-      <change beforePath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/knowledge/service/impl/KnowledgeChunkServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/knowledge/service/impl/KnowledgeChunkServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bootstrap/target/classes/com/rks/knowledge/service/impl/KnowledgeChunkServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/target/classes/com/rks/knowledge/service/impl/KnowledgeChunkServiceImpl.class" afterDir="false" />
-    </list>
+    <list default="true" id="94bb44ff-cfc3-4ab9-90c9-10843f4b1508" name="更改" comment="修复前端状态管理耦合" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -95,7 +92,7 @@
       <workItem from="1777274074647" duration="8035000" />
       <workItem from="1777370667876" duration="2000" />
       <workItem from="1777370704002" duration="3208000" />
-      <workItem from="1777431309409" duration="1641000" />
+      <workItem from="1777431309409" duration="2027000" />
     </task>
     <task id="LOCAL-00001" summary="初次提交">
       <option name="closed" value="true" />
@@ -177,7 +174,23 @@
       <option name="project" value="LOCAL" />
       <updated>1777432828750</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="修复Milvus 写入失败数据不一致">
+      <option name="closed" value="true" />
+      <created>1777432959799</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1777432959799</updated>
+    </task>
+    <task id="LOCAL-00012" summary="修复前端状态管理耦合">
+      <option name="closed" value="true" />
+      <created>1777433319586</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1777433319586</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -214,6 +227,8 @@
     <MESSAGE value="修改登录默认用户为guest" />
     <MESSAGE value="修复知识库删除资源泄漏" />
     <MESSAGE value="修复批量创建 Chunk 索引分配竞态条件" />
-    <option name="LAST_COMMIT_MESSAGE" value="修复批量创建 Chunk 索引分配竞态条件" />
+    <MESSAGE value="修复Milvus 写入失败数据不一致" />
+    <MESSAGE value="修复前端状态管理耦合" />
+    <option name="LAST_COMMIT_MESSAGE" value="修复前端状态管理耦合" />
   </component>
 </project>
