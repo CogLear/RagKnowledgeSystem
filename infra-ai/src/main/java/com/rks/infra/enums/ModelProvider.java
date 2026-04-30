@@ -28,6 +28,11 @@ public enum ModelProvider {
     SILICON_FLOW("siliconflow"),
 
     /**
+     * MiniMax AI 模型服务
+     */
+    MINIMAX("minimax"),
+
+    /**
      * 空实现，用于测试或占位
      */
     NOOP("noop");

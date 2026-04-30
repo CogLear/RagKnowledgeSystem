@@ -5,10 +5,51 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="94bb44ff-cfc3-4ab9-90c9-10843f4b1508" name="更改" comment="优化低分结果过滤与扩展搜索">
-      <change beforePath="$PROJECT_DIR$/.claude/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bootstrap/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/src/main/resources/application.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bootstrap/target/classes/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/target/classes/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bootstrap/target/classes/com/rks/core/chunk/AbstractEmbeddingChunker.class" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/target/classes/com/rks/core/chunk/AbstractEmbeddingChunker.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bootstrap/target/classes/com/rks/ingestion/node/EnhancerNode.class" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/target/classes/com/rks/ingestion/node/EnhancerNode.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bootstrap/target/classes/com/rks/ingestion/node/EnricherNode.class" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/target/classes/com/rks/ingestion/node/EnricherNode.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bootstrap/target/classes/com/rks/rag/controller/RAGSettingsController.class" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/target/classes/com/rks/rag/controller/RAGSettingsController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bootstrap/target/classes/com/rks/rag/service/handler/StreamCallbackFactory.class" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/target/classes/com/rks/rag/service/handler/StreamCallbackFactory.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bootstrap/target/classes/com/rks/rag/service/handler/StreamChatEventHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/target/classes/com/rks/rag/service/handler/StreamChatEventHandler.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bootstrap/target/classes/com/rks/rag/service/handler/StreamChatHandlerParams$StreamChatHandlerParamsBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/target/classes/com/rks/rag/service/handler/StreamChatHandlerParams$StreamChatHandlerParamsBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bootstrap/target/classes/com/rks/rag/service/handler/StreamChatHandlerParams.class" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/target/classes/com/rks/rag/service/handler/StreamChatHandlerParams.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bootstrap/target/classes/com/rks/rag/service/impl/ConversationServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/target/classes/com/rks/rag/service/impl/ConversationServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra-ai/src/main/java/com/rks/infra/enums/ModelProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/infra-ai/src/main/java/com/rks/infra/enums/ModelProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/chat/BaiLianChatClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/chat/BaiLianChatClient.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/chat/ChatClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/chat/ChatClient.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/chat/FirstPacketAwaiter$Result$Type.class" beforeDir="false" afterPath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/chat/FirstPacketAwaiter$Result$Type.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/chat/FirstPacketAwaiter$Result.class" beforeDir="false" afterPath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/chat/FirstPacketAwaiter$Result.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/chat/FirstPacketAwaiter.class" beforeDir="false" afterPath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/chat/FirstPacketAwaiter.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/chat/OllamaChatClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/chat/OllamaChatClient.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/chat/RoutingLLMService$ProbeBufferingCallback$BufferedEvent.class" beforeDir="false" afterPath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/chat/RoutingLLMService$ProbeBufferingCallback$BufferedEvent.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/chat/RoutingLLMService$ProbeBufferingCallback$EventType.class" beforeDir="false" afterPath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/chat/RoutingLLMService$ProbeBufferingCallback$EventType.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/chat/RoutingLLMService$ProbeBufferingCallback.class" beforeDir="false" afterPath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/chat/RoutingLLMService$ProbeBufferingCallback.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/chat/RoutingLLMService.class" beforeDir="false" afterPath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/chat/RoutingLLMService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/chat/SiliconFlowChatClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/chat/SiliconFlowChatClient.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/config/AIModelProperties$ModelCandidate.class" beforeDir="false" afterPath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/config/AIModelProperties$ModelCandidate.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/config/AIModelProperties$ModelGroup.class" beforeDir="false" afterPath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/config/AIModelProperties$ModelGroup.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/config/AIModelProperties$ProviderConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/config/AIModelProperties$ProviderConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/config/AIModelProperties$Selection.class" beforeDir="false" afterPath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/config/AIModelProperties$Selection.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/config/AIModelProperties$Stream.class" beforeDir="false" afterPath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/config/AIModelProperties$Stream.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/config/AIModelProperties.class" beforeDir="false" afterPath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/config/AIModelProperties.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/embedding/OllamaEmbeddingClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/embedding/OllamaEmbeddingClient.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/embedding/RoutingEmbeddingService.class" beforeDir="false" afterPath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/embedding/RoutingEmbeddingService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/embedding/SiliconFlowEmbeddingClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/embedding/SiliconFlowEmbeddingClient.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/enums/ModelProvider.class" beforeDir="false" afterPath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/enums/ModelProvider.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/http/ModelUrlResolver.class" beforeDir="false" afterPath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/http/ModelUrlResolver.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/model/ModelHealthStore$ModelHealth.class" beforeDir="false" afterPath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/model/ModelHealthStore$ModelHealth.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/model/ModelHealthStore$State.class" beforeDir="false" afterPath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/model/ModelHealthStore$State.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/model/ModelHealthStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/model/ModelHealthStore.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/model/ModelRoutingExecutor.class" beforeDir="false" afterPath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/model/ModelRoutingExecutor.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/model/ModelSelector.class" beforeDir="false" afterPath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/model/ModelSelector.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/model/ModelTarget.class" beforeDir="false" afterPath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/model/ModelTarget.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/rerank/BaiLianRerankClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/rerank/BaiLianRerankClient.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/rerank/NoopRerankClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/rerank/NoopRerankClient.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/rerank/RoutingRerankService.class" beforeDir="false" afterPath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/rerank/RoutingRerankService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/util/LLMResponseCleaner.class" beforeDir="false" afterPath="$PROJECT_DIR$/infra-ai/target/classes/com/rks/infra/util/LLMResponseCleaner.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -328,5 +369,9 @@
     <MESSAGE value="优化检索结果缓存" />
     <MESSAGE value="优化低分结果过滤与扩展搜索" />
     <option name="LAST_COMMIT_MESSAGE" value="优化低分结果过滤与扩展搜索" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>
