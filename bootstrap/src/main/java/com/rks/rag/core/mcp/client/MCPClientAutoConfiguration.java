@@ -1,6 +1,4 @@
-
 package com.rks.rag.core.mcp.client;
-
 import com.rks.rag.core.mcp.MCPTool;
 import com.rks.rag.core.mcp.MCPToolRegistry;
 import jakarta.annotation.PostConstruct;
@@ -9,9 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-
 import java.util.List;
-
 /**
  * MCP 客户端自动配置
  * 根据配置的 MCP Server 列表，自动创建 MCPClient 并注册远程工具到 MCPToolRegistry

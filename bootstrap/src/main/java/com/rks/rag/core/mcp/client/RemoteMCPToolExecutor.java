@@ -11,7 +11,27 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * 远程 MCP 工具执行器
- * 实现 MCPToolExecutor 接口，通过 MCPClient 远程调用 MCP Server 上的工具
+ *
+ * <p>功能说明：
+ * 实现 MCPToolExecutor 接口，通过 MCPClient 远程调用 MCP Server 上的工具。
+ * 这是本地 RAG 系统调用远程 MCP 工具的桥梁。
+ *
+ * <h2>执行流程</h2>
+ * <ol>
+ *   <li>调用 mcpClient.callTool(toolId, parameters)</li>
+ *   <li>记录执行耗时</li>
+ *   <li>构建 MCPResponse 返回结果</li>
+ * </ol>
+ *
+ * <h2>响应构建</h2>
+ * <ul>
+ *   <li>成功 → MCPResponse.success(toolId, result)</li>
+ *   <li>调用失败 → MCPResponse.error(toolId, "REMOTE_CALL_FAILED", "远程工具调用失败")</li>
+ *   <li>异常 → MCPResponse.error(toolId, "REMOTE_CALL_ERROR", exception.message)</li>
+ * </ul>
+ *
+ * @see MCPToolExecutor
+ * @see MCPClient
  */
 @Slf4j
 @RequiredArgsConstructor

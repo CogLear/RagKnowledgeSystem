@@ -19,7 +19,38 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 基于 OkHttp 的 MCP 客户端实现
- * 使用 Streamable HTTP 传输协议（JSON-RPC 2.0）与远程 MCP Server 通信
+ *
+ * <p>功能说明：
+ * 使用 Streamable HTTP 传输协议（JSON-RPC 2.0）与远程 MCP Server 通信。
+ * 遵循 MCP (Model Context Protocol) 标准协议。
+ *
+ * <h2>JSON-RPC 2.0 协议流程</h2>
+ * <ol>
+ *   <li>{@link #initialize()} - 发送 initialize 请求，携带协议版本和客户端信息</li>
+ *   <li>收到响应后 → 发送 notifications/initialized 通知（MCP 协议要求）</li>
+ *   <li>{@link #listTools()} - 通过 tools/list 方法获取工具列表</li>
+ *   <li>{@link #callTool(String, Map)} - 通过 tools/call 方法调用工具</li>
+ * </ol>
+ *
+ * <h2>工具格式转换</h2>
+ * convertToMcpTool() 方法将 MCP 标准 Tool Schema 转换为 bootstrap 的 MCPTool：
+ * <ul>
+ *   <li>name → toolId</li>
+ *   <li>description → description</li>
+ *   <li>inputSchema.properties → parameters</li>
+ *   <li>required → 参数必填标记</li>
+ * </ul>
+ *
+ * <h2>错误处理</h2>
+ * <ul>
+ *   <li>HTTP 状态码非 2xx → 返回 null</li>
+ *   <li>响应体为空 → 返回 null</li>
+ *   <li>JSON-RPC error 响应 → 记录日志，返回 null</li>
+ *   <li>网络异常 → 捕获 IOException，记录日志，返回 null</li>
+ * </ul>
+ *
+ * @see MCPClient
+ * @see RemoteMCPToolExecutor
  */
 @Slf4j
 @RequiredArgsConstructor

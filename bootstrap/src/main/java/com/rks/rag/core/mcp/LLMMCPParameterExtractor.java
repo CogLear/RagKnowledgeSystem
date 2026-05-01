@@ -19,6 +19,32 @@ import static com.rks.rag.constant.RAGConstant.MCP_PARAMETER_EXTRACT_PROMPT_PATH
 
 /**
  * 基于 LLM 的 MCP 参数提取器实现
+ *
+ * <p>功能说明：
+ * 使用 LLM 从用户自然语言问题中提取工具调用所需的参数。
+ * 这是实现"工具调用"功能的关键组件。
+ *
+ * <p>执行流程：
+ * <ol>
+ *   <li>构建 Prompt：包含系统提示词（参数提取规则）、工具定义、用户问题</li>
+ *   <li>调用 LLM 获取 JSON 格式的参数提取结果</li>
+ *   <li>解析 JSON 响应，只保留工具定义中声明的参数</li>
+ *   <li>填充默认值</li>
+ * </ol>
+ *
+ * <p>Prompt 模板：
+ * 使用 PromptTemplateLoader 加载标准模板，也可传入自定义提示词。
+ * 模板路径：{@value com.rks.rag.constant.RAGConstant#MCP_PARAMETER_EXTRACT_PROMPT_PATH}
+ *
+ * <p>容错设计：
+ * <ul>
+ *   <li>JSON 解析失败 → 返回默认参数</li>
+ *   <li>LLM 调用异常 → 返回默认参数</li>
+ *   <li>参数缺失 → 使用默认值填充</li>
+ * </ul>
+ *
+ * @see MCPParameterExtractor
+ * @see MCPTool
  */
 @Slf4j
 @Service
