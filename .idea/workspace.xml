@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="94bb44ff-cfc3-4ab9-90c9-10843f4b1508" name="更改" comment="添加MINMAX模型chat" />
+    <list default="true" id="94bb44ff-cfc3-4ab9-90c9-10843f4b1508" name="更改" comment="对话压缩注释">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/RAG后端流程详解.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/RAG后端流程详解.md" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -94,6 +97,8 @@
       <workItem from="1777370704002" duration="3208000" />
       <workItem from="1777431309409" duration="3935000" />
       <workItem from="1777443576806" duration="938000" />
+      <workItem from="1777625476440" duration="8152000" />
+      <workItem from="1777645340749" duration="2778000" />
     </task>
     <task id="LOCAL-00001" summary="初次提交">
       <option name="closed" value="true" />
@@ -247,7 +252,23 @@
       <option name="project" value="LOCAL" />
       <updated>1777459083423</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="文档">
+      <option name="closed" value="true" />
+      <created>1777627073875</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1777627073875</updated>
+    </task>
+    <task id="LOCAL-00021" summary="对话压缩注释">
+      <option name="closed" value="true" />
+      <created>1777627637762</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1777627637765</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -322,7 +343,9 @@
     <MESSAGE value="增加 Redis 向量缓存层" />
     <MESSAGE value="优化检索结果缓存" />
     <MESSAGE value="优化低分结果过滤与扩展搜索" />
-    <option name="LAST_COMMIT_MESSAGE" value="优化低分结果过滤与扩展搜索" />
+    <MESSAGE value="文档" />
+    <MESSAGE value="对话压缩注释" />
+    <option name="LAST_COMMIT_MESSAGE" value="对话压缩注释" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
