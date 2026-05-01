@@ -6,11 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="94bb44ff-cfc3-4ab9-90c9-10843f4b1508" name="更改" comment="添加注释">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/rag/core/mcp/LLMMCPParameterExtractor.java" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/rag/core/mcp/LLMMCPParameterExtractor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/rag/core/mcp/client/HttpMCPClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/rag/core/mcp/client/HttpMCPClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/rag/core/mcp/client/MCPClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/rag/core/mcp/client/MCPClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/rag/core/mcp/client/RemoteMCPToolExecutor.java" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/rag/core/mcp/client/RemoteMCPToolExecutor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bootstrap/target/classes/com/rks/rag/core/memory/MySQLConversationMemorySummaryService.class" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/target/classes/com/rks/rag/core/memory/MySQLConversationMemorySummaryService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/RAG后端流程详解.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/RAG后端流程详解.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -102,7 +98,7 @@
       <workItem from="1777431309409" duration="3935000" />
       <workItem from="1777443576806" duration="938000" />
       <workItem from="1777625476440" duration="8152000" />
-      <workItem from="1777645340749" duration="4396000" />
+      <workItem from="1777645340749" duration="5408000" />
     </task>
     <task id="LOCAL-00001" summary="初次提交">
       <option name="closed" value="true" />
@@ -280,7 +276,15 @@
       <option name="project" value="LOCAL" />
       <updated>1777648379074</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="添加注释">
+      <option name="closed" value="true" />
+      <created>1777650149232</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1777650149232</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

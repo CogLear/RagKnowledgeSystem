@@ -11,19 +11,17 @@
 │                     (流式对话服务核心实现)                              │
 └─────────────────────────────────────────────────────────────────────────┘
     │
-    ├─▶ 1. 记忆加载 ──────────▶ ConversationMemoryService
+    ├─▶ 1. 记忆加载 ──────────▶ 记忆模块
     │
-    ├─▶ 2. 查询改写拆分 ──────▶ MultiQuestionRewriteService
+    ├─▶ 2. 查询改写拆分 ──────▶ 查询改写模块
     │
-    ├─▶ 3. 意图解析 ──────────▶ IntentResolver / DefaultIntentClassifier
+    ├─▶ 3. 意图解析 ──────────▶ 意图分类模块
     │
-    ├─▶ 4. 歧义引导检测 ──────▶ IntentGuidanceService
+    ├─▶ 4. 知识库/MCP检索 ────▶ 检索引擎模块
     │
-    ├─▶ 5. 知识库/MCP检索 ────▶ RetrievalEngine / MultiChannelRetrievalEngine
+    ├─▶ 5. Prompt组装 ───────▶ Prompt模块
     │
-    ├─▶ 6. Prompt组装 ───────▶ RAGPromptService
-    │
-    └─▶ 7. LLM流式输出 ───────▶ LLMService (SSE)
+    └─▶ 6. LLM流式输出 ───────▶ LLM服务 (SSE)
 ```
 
 ---
@@ -49,45 +47,179 @@ public SseEmitter chat(@RequestParam String question,
 
 ## 3. 核心流程详解
 
-### 3.1 记忆加载
+### 3.1 记忆模块
 
-**组件**: `DefaultConversationMemoryService`
+#### 3.1.1 模块概述
 
-```java
-List<ChatMessage> history = memoryService.loadAndAppend(
-    actualConversationId, userId, ChatMessage.user(question)
-);
+记忆模块负责管理对话历史，解决对话越长历史消息越多、Token 消耗越大的问题。
+
+**核心组件**：
+
+| 组件 | 职责 |
+|------|------|
+| `DefaultConversationMemoryService` | 对话记忆服务门面，对外提供统一接口 |
+| `MySQLConversationMemoryStore` | 历史消息的 MySQL 持久化存储 |
+| `MySQLConversationMemorySummaryService` | 对话摘要压缩服务，LLM 生成摘要 |
+
+**设计目标**：
+- 支持多轮对话上下文
+- 通过摘要压缩控制 Token 消耗
+- 并行加载提高性能
+- 分布式锁避免并发压缩冲突
+
+#### 3.1.2 消息加载流程
+
 ```
-
-**加载顺序**:
-```
-┌──────────────────┐
-│ 加载对话摘要      │ ← 从 MySQL t_conversation_summary 加载
-└────────┬─────────┘
-         │ 并行
-         ▼
-┌──────────────────┐
-│ 加载历史消息      │ ← 从 MySQL t_message 加载
-└────────┬─────────┘
+DefaultConversationMemoryService.load(conversationId, userId)
          │
          ▼
-┌──────────────────────────────────┐
-│ 合并：[摘要, 历史消息1, 2, ...]   │
-└──────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│ 并行加载（CompletableFuture）                                │
+│                                                             │
+│  ├─▶ loadSummaryWithFallback()                              │
+│  │       └─▶ summaryService.loadLatestSummary()            │
+│  │               └─▶ 从 MySQL t_conversation_summary 加载  │
+│  │                                                             │
+│  └─▶ loadHistoryWithFallback()                              │
+│          └─▶ memoryStore.loadHistory()                      │
+│                  └─▶ 从 MySQL t_message 加载历史消息        │
+└─────────────────────────────────────────────────────────────┘
+         │
+         ▼
+┌─────────────────────────────────────────────────────────────┐
+│ 合并结果                                                   │
+│                                                             │
+│ [摘要SYSTEM, 历史消息1, 历史消息2, ...]                     │
+│                                                             │
+│ - 如果有摘要，添加到列表开头                                │
+│ - decorateIfNeeded() 添加"对话摘要："前缀                   │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-**摘要压缩机制**:
-- 消息数 >= `summary-start-turns`(5) 时触发自动摘要
-- 使用 LLM 将多轮对话压缩为简洁摘要
-- 摘要后历史消息裁剪为 `history-keep-turns`(4) 条
+**历史加载数量限制**：
+- `maxTurns = memoryProperties.historyKeepTurns`（默认 4）
+- 实际加载消息数 = `maxTurns × 2`（每轮包含 USER + ASSISTANT）
+
+#### 3.1.3 消息追加流程
+
+```
+DefaultConversationMemoryService.append(conversationId, userId, message)
+         │
+         ▼
+┌─────────────────────────────────────────────────────────────┐
+│ 步骤1：消息存储                                            │
+│ memoryStore.append(conversationId, userId, message)        │
+│ └─▶ 保存到 MySQL t_message 表                             │
+└─────────────────────────────────────────────────────────────┘
+         │
+         ▼
+┌─────────────────────────────────────────────────────────────┐
+│ 步骤2：触发摘要压缩检查                                     │
+│ summaryService.compressIfNeeded(conversationId, userId, msg)│
+└─────────────────────────────────────────────────────────────┘
+```
+
+**compressIfNeeded 触发条件**：
+- 摘要功能必须启用（`summaryEnabled = true`）
+- 必须是 ASSISTANT 消息（AI 回答才触发）
+- USER 消息不触发摘要
+
+#### 3.1.4 摘要压缩流程
+
+```
+compressIfNeeded()
+         │
+         ▼
+异步执行 doCompressIfNeeded()
+         │
+         ▼
+┌─────────────────────────────────────────────────────────────┐
+│ 步骤1：获取分布式锁                                        │
+│ lockKey = "ragent:memory:summary:lock:{userId}:{convId}"   │
+│ tryLock(0, 5min) → 获取失败则跳过                          │
+└─────────────────────────────────────────────────────────────┘
+         │
+         ▼
+┌─────────────────────────────────────────────────────────────┐
+│ 步骤2：统计消息数                                           │
+│ total = conversationGroupService.countUserMessages()        │
+│ total < summaryStartTurns(5) → 不满足触发条件，跳过         │
+└─────────────────────────────────────────────────────────────┘
+         │
+         ▼
+┌─────────────────────────────────────────────────────────────┐
+│ 步骤3：计算待压缩区间                                       │
+│                                                             │
+│ 消息序列：[msg1, msg2, msg3, msg4, msg5, msg6, msg7, msg8]   │
+│                                              ↑              │
+│                                          cutoffId           │
+│                                              ↑              │
+│ latestSummary.lastMessageId = msg4 → afterId = msg4        │
+│                                                             │
+│ 待压缩区间 = [afterId, cutoffId] = [msg5, msg8]             │
+└─────────────────────────────────────────────────────────────┘
+         │
+         ▼
+┌─────────────────────────────────────────────────────────────┐
+│ 步骤4：调用 LLM 生成摘要                                    │
+│                                                             │
+│ Prompt 构建：                                               │
+│ - System: "合并以上对话...输出更新摘要≤200字符"             │
+│ - Assistant: "历史摘要（用于合并去重）..."                  │
+│ - User: [待摘要消息1...]                                   │
+│ - User: "合并以上对话与历史摘要，输出更新摘要"              │
+└─────────────────────────────────────────────────────────────┘
+         │
+         ▼
+┌─────────────────────────────────────────────────────────────┐
+│ 步骤5：保存摘要                                             │
+│ save to MySQL t_conversation_summary                       │
+│ lastMessageId = 待压缩区间的最后一条消息 ID                 │
+└─────────────────────────────────────────────────────────────┘
+         │
+         ▼
+释放分布式锁
+```
+
+#### 3.1.5 增量摘要设计
+
+**为什么用消息 ID 区间而不是时间戳**：
+- 支持增量摘要：每次只摘要新增消息
+- 避免重复摘要：已摘要的消息不会再次提交给 LLM
+- 精度更高：消息 ID 递增，不会出现时间冲突
+
+**摘要合并逻辑**：
+```
+已有摘要："用户问了请假、报销2个问题"
+新消息：[msg5, msg6, msg7, msg8, msg9, msg10]
+         │
+         ▼
+LLM 收到：
+- 历史摘要："用户问了请假、报销2个问题（仅用于去重）"
+- 新消息： msg5~msg10
+- 要求：合并后输出更新摘要
+         │
+         ▼
+结果："用户问了请假、报销、考勤3个问题"
+```
 
 ---
 
-### 3.2 查询改写与拆分
+### 3.2 查询改写模块
 
-**组件**: `MultiQuestionRewriteService`
+#### 3.2.1 模块概述
 
-**流程**:
+查询改写模块负责将用户问题进行归一化和拆分，提升检索召回率。
+
+**核心组件**：`MultiQuestionRewriteService`
+
+**功能**：
+- 术语归一化（QueryTermMappingService）
+- LLM 改写（可选）
+- 子问题拆分
+
+#### 3.2.2 执行流程
+
 ```
 用户问题 → QueryTermMappingService.normalize() → 归一化处理
                               │
@@ -105,7 +237,25 @@ List<ChatMessage> history = memoryService.loadAndAppend(
         └────────────┘                  └──────────────┘
 ```
 
-**LLM 改写 Prompt 输出格式**:
+#### 3.2.3 术语归一化
+
+`QueryTermMappingService` 将用户查询中的非标准术语映射为标准表述：
+
+```
+用户问："平安保险怎么退保"
+知识库中："退保流程" 章节
+映射规则：平安保司 → 平安保险
+归一化后：能匹配到"退保流程"相关内容
+```
+
+**规则**：
+- 按优先级倒序执行
+- sourceTerm 长度长的优先匹配
+- 已匹配到 targetTerm 开头时跳过（避免重复替换）
+
+#### 3.2.4 LLM 改写格式
+
+**Prompt 输出格式**：
 ```json
 {
   "rewrite": "改写后的查询",
@@ -113,23 +263,24 @@ List<ChatMessage> history = memoryService.loadAndAppend(
 }
 ```
 
-**规则兜底**: LLM 不可用时，按常见分隔符（`?？。；;\n`）拆分
+**规则兜底**：LLM 不可用时，按常见分隔符（`?？。；;\n`）拆分
 
 ---
 
-### 3.3 意图分类
+### 3.3 意图分类模块
 
-**组件**: `IntentResolver` + `DefaultIntentClassifier`（实现 `IntentClassifier` + `IntentNodeRegistry`）
+#### 3.3.1 模块概述
 
-**职责划分**:
+意图分类模块决定每个子问题该干什么：检索知识库 / 调用 MCP 工具 / 直接回答。
+
+**核心组件**：
+
 | 组件 | 职责 |
 |------|------|
 | `IntentResolver` | 编排层：子问题拆分、并行分类、意图分流、总量管控 |
 | `DefaultIntentClassifier` | 执行层：加载意图树、调用 LLM 分类、结果解析 |
 
----
-
-#### 3.3.1 意图树结构
+#### 3.3.2 意图树结构
 
 意图树存储在 `t_intent_node` 表，三级层级结构：
 
@@ -140,18 +291,7 @@ List<ChatMessage> history = memoryService.loadAndAppend(
 │       └── TOPIC (Level 2) — 具体话题（叶子节点）← 分类目标
 ```
 
-**IntentNode 数据结构**:
-| 字段 | 说明 |
-|------|------|
-| id | 意图编码（如 "oa_001"） |
-| name | 意图名称（如 "请假流程"） |
-| level | 层级 (DOMAIN/CATEGORY/TOPIC) |
-| kind | 类型：KB=0 / SYSTEM=1 / MCP=2 |
-| mcpToolId | MCP 工具 ID（仅 MCP 类型有效） |
-| promptTemplate | 自定义 Prompt 模板（可选） |
-| fullPath | 完整路径（如 "集团信息化 > 人事 > 请假"） |
-
-**IntentKind 三种类型**:
+**IntentKind 三种类型**：
 
 | Kind | 值 | 行为 | 示例 |
 |------|---|------|------|
@@ -159,9 +299,7 @@ List<ChatMessage> history = memoryService.loadAndAppend(
 | SYSTEM | 1 | 使用系统 Prompt 直接回答 | "你好" / "你是谁" |
 | MCP | 2 | 调用 MCP 工具获取动态数据 | "帮我算一下 100-20" |
 
----
-
-#### 3.3.2 IntentResolver 编排流程
+#### 3.3.3 意图分类流程
 
 ```
 IntentResolver.resolve(RewriteResult)
@@ -191,84 +329,7 @@ IntentResolver.resolve(RewriteResult)
     └─▶【步骤5】返回 List<SubQuestionIntent>
 ```
 
-**总量管控示例**:
-```
-假设 3 个子问题，MAX_INTENT_COUNT = 4
-分类结果（按分数排序）：[A(0.9), B(0.8), C(0.7), D(0.6), E(0.5)]
-
-Step 1 保底：每个子问题选一个最高分
-  → 子问题0: A，子问题1: B，子问题2: D
-
-Step 2 剩余配额：MAX - 3 = 1，按分选下一个
-  → 选 C（0.7分）
-
-最终：子问题0→[A]，子问题1→[B, C]，子问题2→[D]
-```
-
----
-
-#### 3.3.3 DefaultIntentClassifier 执行细节
-
-**数据加载（初始化时）**:
-```
-DefaultIntentClassifier.init()
-    │
-    └─▶ IntentTreeCacheManager.isCacheExists()?
-            │
-            ├── 是 → 直接从 Redis 加载意图树
-            │
-            └── 否 → loadIntentTreeFromDB() → saveIntentTreeToCache()
-                       │
-                       └─▶ 从 MySQL t_intent_node 加载所有未删除节点
-                           → 构建树形结构（parentCode → children）
-                           → 填充 fullPath（用于日志和分类 Prompt）
-```
-
-**LLM 分类流程**:
-```
-用户问题（如"请假流程是什么？"）
-    │
-    ▼
-┌──────────────────────────────────────────────────────────────┐
-│ buildPrompt(leafNodes)                                      │
-│                                                              │
-│ 构建系统 Prompt：                                             │
-│ - 列出所有叶子节点的 id / path / description / type / examples│
-│                                                              │
-│ 示例输出：                                                   │
-│ - id=leave_001                                              │
-│   path=集团信息化 > 人事 > 请假                              │
-│   description=请假申请审批流程                               │
-│   type=KB                                                   │
-│   examples=如何请假 / 请假审批多久 / ...                     │
-│                                                              │
-│ - id=mcp_calc                                               │
-│   path=系统工具 > 计算器                                     │
-│   description=数学计算                                       │
-│   type=MCP                                                  │
-│   toolId=calculator                                        │
-└──────────────────────────────────────────────────────────────┘
-    │
-    ▼
-┌──────────────────────────────────────────────────────────────┐
-│ LLM 调用 (temperature=0.1, topP=0.3)                        │
-│                                                              │
-│ 发送 Prompt + 用户问题给 LLM                                 │
-│                                                              │
-│ 期望返回格式：                                               │
-│ [                                                            │
-│   {"id": "leave_001", "score": 0.95, "reason": "匹配请假..."},│
-│   {"id": "expense_001", "score": 0.85, "reason": "报销流程..."} │
-│ ]                                                            │
-└──────────────────────────────────────────────────────────────┘
-    │
-    ▼
-解析结果 → 按 score 降序排序 → 返回 List<NodeScore>
-```
-
----
-
-#### 3.3.4 意图分类结果的分流
+#### 3.3.4 意图分流
 
 `IntentResolver.mergeIntentGroup()` 将意图按类型分组：
 
@@ -288,130 +349,7 @@ mergeIntentGroup(List<SubQuestionIntent>)
                    └─▶ RetrievalEngine → MultiChannelRetrievalEngine 向量检索
 ```
 
-**过滤规则**:
-
-| 类型 | 条件 | 进入 |
-|------|------|------|
-| MCP | kind==MCP **且** mcpToolId 非空 | mcpIntents |
-| KB | kind==KB **或** kind==null | kbIntents |
-| SYSTEM | kind==SYSTEM | 不进入两组，独立判断 |
-
----
-
-#### 3.3.5 意图识别的作用
-
-**意图识别在 RAG 流程中的核心价值**：决定「用哪个知识库 / 调哪个工具 / 直接回答」。
-
-##### 1. 路由分发
-
-用户一个问题进来，系统需要判断：
-
-```
-"请假流程是什么？" → 应该查哪个知识库？
-"1+1等于几？"     → 应该调 MCP 计算器工具？
-"你好"           → 直接回答，不用查任何库
-```
-
-意图识别就是来解决这个「该干什么」的问题。
-
-##### 2. 精确检索范围
-
-假设系统有两个知识库：OA系统 + 保险系统
-
-| 方式 | 行为 | 结果 |
-|------|------|------|
-| 无意图识别 | 全量检索两个库 | 可能混淆答案（查请假流程拉出保险条款） |
-| 有意图识别 | 只检索"人事/请假"关联的库 | 答案精准 |
-
-##### 3. 触发 MCP 工具
-
-MCP 类型的意图触发外部工具调用：
-
-```
-"帮我算一下 100-20"
-
-意图识别结果：
-  kind = MCP
-  mcpToolId = calculator
-         │
-         ▼
-MCPToolRegistry 调用 calculator 工具
-         │
-         ▼
-返回 "80" 作为上下文
-         │
-         ▼
-最终回答："100-20=80"
-```
-
-##### 4. 跳过 RAG（纯系统响应）
-
-SYSTEM 类型的意图不走检索流程，直接回答：
-
-```
-"你是谁？"
-
-意图识别：kind = SYSTEM
-              │
-              ▼
-系统 Prompt 直接回答"我是 xxx 智能助手"
-              │
-              ▼
-不查知识库，不调工具
-```
-
-##### 5. 在完整流程中的位置
-
-```
-用户问题
-    │
-    ▼
-┌─────────────────┐
-│ 查询改写拆分    │  把复杂问题拆成子问题
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│ ★ 意图识别 ★    │  ← 这里：决定每个子问题该干什么
-└────────┬────────┘
-         │
-    ┌────┴─────────────────────────────┐
-    │            识别结果决定后续分支      │
-    ▼            ▼                      ▼
-┌────────┐  ┌────────┐  ┌────────┐  ┌────────┐
-│ KB意图  │  │ MCP意图│  │SYSTEM  │  │ 歧义   │
-│         │  │        │  │意图    │  │ 引导   │
-└────┬────┘  └────┬────┘  └────┬────┘  └───┬────┘
-     │            │            │            │
-     ▼            ▼            │            ▼
-┌────────┐  ┌────────┐         │     返回澄清问题
-│ 检索    │  │ 调用   │         │
-│ 知识库  │  │ MCP工具│         │ 不检索不调用
-└────┬────┘  └────┬────┘         ▼
-     │            │        ┌────────┐
-     └─────┬──────┴────────▶│ Prompt 组装 │
-           │                 └────────┬────┘
-           └──────────────────────────┘
-                                       │
-                                       ▼
-                               LLM 生成最终回答
-```
-
-##### 6. 实际例子
-
-| 用户问题 | 识别出的意图 | 后续动作 |
-|---------|------------|---------|
-| "请假怎么申请？" | KB: `hr.leave` | 查 HR 知识库 |
-| "北京天气怎么样？" | MCP: `weather` | 调天气 API |
-| "你好" | SYSTEM: `greeting` | 系统 Prompt 直接答 |
-| "报销多久到账？" | KB: `finance.expense` | 查财务知识库 |
-| "1GB=多少MB？" | MCP: `calculator` | 调计算器 |
-
-**关键点**：意图识别把「通用问题」精准映射到「具体知识库/工具」，避免一张脑图查遍所有内容导致的答案混乱。
-
----
-
-### 3.4 歧义引导检测
+#### 3.3.5 歧义引导检测
 
 **组件**: `IntentGuidanceService`
 
@@ -433,27 +371,33 @@ SYSTEM 类型的意图不走检索流程，直接回答：
 
 ---
 
-### 3.5 检索引擎
+### 3.4 检索引擎模块
 
-**组件**: `MultiChannelRetrievalEngine`
+#### 3.4.1 模块概述
 
-**通道类型**:
+检索引擎负责根据意图分类结果检索知识库文档和 MCP 工具。
+
+**核心组件**：`MultiChannelRetrievalEngine`
+
+#### 3.4.2 通道类型
+
 | 通道 | 说明 |
 |------|------|
 | `VectorGlobalSearchChannel` | 全局向量检索 |
 | `IntentDirectedSearchChannel` | 意图导向检索 |
 | `CollectionParallelRetriever` | 分 collection 并行检索 |
 
-**并行检索流程**:
+#### 3.4.3 并行检索流程
+
 ```
 SearchContext
     │
     ▼
 ┌────────────────────────────────────────┐
 │ executeSearchChannels()                │
-│ 1. 过滤 isEnabled() = true 的通道       │
+│ 1. 过滤 isEnabled() = true 的通道     │
 │ 2. 按 priority 排序                     │
-│ 3. CompletableFuture.supplyAsync()     │
+│ 3. CompletableFuture.supplyAsync()   │
 │    并行执行各通道                        │
 │ 4. 汇总结果                             │
 └────────────────────────────────────────┘
@@ -461,7 +405,7 @@ SearchContext
     ▼
 ┌────────────────────────────────────────┐
 │ executePostProcessors()                │
-│ 1. RerankPostProcessor (重排序)        │
+│ 1. RerankPostProcessor (重排序)       │
 │ 2. DeduplicationPostProcessor (去重)  │
 └────────────────────────────────────────┘
     │
@@ -469,57 +413,91 @@ SearchContext
 List<RetrievedChunk>
 ```
 
-**检索上下文 `SearchContext`**:
-| 字段 | 说明 |
+---
+
+### 3.5 Prompt 模块
+
+#### 3.5.1 模块概述
+
+Prompt 模块负责将检索结果组装成完整的消息序列，发送给 LLM。
+
+**核心组件**：
+
+| 组件 | 职责 |
 |------|------|
-| originalQuestion | 原始问题 |
-| rewrittenQuestion | 改写后问题 |
-| intents | 子问题意图列表 |
-| topK | 期望返回结果数 |
+| `RAGPromptService` | Prompt 编排核心服务，负责场景判断和消息组装 |
+| `PromptTemplateLoader` | 从 classpath 加载模板文件，带缓存 |
+| `PromptContext` | 上下文数据载体 |
+
+#### 3.5.2 场景类型
+
+| 场景 | 条件 | 说明 |
+|------|------|------|
+| `KB_ONLY` | 只有 KB 上下文 | 纯知识库问答 |
+| `MCP_ONLY` | 只有 MCP 上下文 | 纯工具调用问答 |
+| `MIXED` | 同时有 KB 和 MCP | 混合模式 |
+| `EMPTY` | 无任何上下文 | 兜底场景 |
+
+#### 3.5.3 消息组装流程
+
+```
+RAGPromptService.buildStructuredMessages()
+         │
+         ▼
+┌─────────────────────────────────────────────────────────────┐
+│ 步骤1：构建 System Prompt                                   │
+│ - plan(context) → 根据场景选择规划方法                       │
+│ - 选择 baseTemplate（意图自定义模板 > 默认模板）            │
+└─────────────────────────────────────────────────────────────┘
+         │
+         ▼
+┌─────────────────────────────────────────────────────────────┐
+│ 步骤2：添加 MCP 上下文（## 动态数据片段）                   │
+└─────────────────────────────────────────────────────────────┘
+         │
+         ▼
+┌─────────────────────────────────────────────────────────────┐
+│ 步骤3：添加 KB 上下文（## 文档内容）                        │
+└─────────────────────────────────────────────────────────────┘
+         │
+         ▼
+┌─────────────────────────────────────────────────────────────┐
+│ 步骤4：添加对话历史                                         │
+└─────────────────────────────────────────────────────────────┘
+         │
+         ▼
+┌─────────────────────────────────────────────────────────────┐
+│ 步骤5：添加用户问题（多子问题时带编号）                     │
+└─────────────────────────────────────────────────────────────┘
+         │
+         ▼
+List<ChatMessage> → LLMStreamService
+```
+
+#### 3.5.4 模板文件
+
+| 模板文件 | 用途 | 场景 |
+|---------|------|------|
+| `answer-chat-kb.st` | 知识库问答模板 | KB_ONLY |
+| `answer-chat-mcp.st` | MCP 工具问答模板 | MCP_ONLY |
+| `answer-chat-mcp-kb-mixed.st` | 混合模式模板 | MIXED |
+| `intent-classifier.st` | 意图分类模板 | 意图识别 |
+| `user-question-rewrite.st` | 查询改写模板 | 查询改写 |
+| `conversation-summary.st` | 对话摘要模板 | 记忆摘要 |
 
 ---
 
-### 3.6 Prompt 组装
-
-**组件**: `RAGPromptService`
-
-**场景类型**:
-| 场景 | 条件 | 默认模板 |
-|------|------|---------|
-| `KB_ONLY` | 只有知识库上下文 | RAG_ENTERPRISE_PROMPT_PATH |
-| `MCP_ONLY` | 只有 MCP 上下文 | MCP_ONLY_PROMPT_PATH |
-| `MIXED` | 同时有 KB 和 MCP | MCP_KB_MIXED_PROMPT_PATH |
-
-**消息顺序**:
-```
-1. System Prompt（系统提示词）
-2. MCP Context（## 动态数据片段）
-3. KB Context（## 文档内容）
-4. History（对话历史）
-5. User Question（用户问题，多子问题时编号）
-```
-
-**多子问题处理**:
-```java
-// 当 subQuestions.size() > 1 时
-"请基于上述文档内容，回答以下问题：\n\n"
-"1. 子问题1\n"
-"2. 子问题2\n"
-```
-
----
-
-### 3.7 LLM 流式输出
+### 3.6 LLM 流式输出
 
 **组件**: `LLMService`
 
 **请求构建**:
 ```java
 ChatRequest.builder()
-    .messages(messages)        // 完整消息列表
-    .temperature(0~0.7D)        // 根据场景调整
+    .messages(messages)
+    .temperature(0~0.7D)
     .topP(ctx.hasMcp() ? 0.8 : 1D)
-    .thinking(deepThinking)    // 是否启用深度思考
+    .thinking(deepThinking)
     .build();
 
 return llmService.streamChat(req, callback);
@@ -532,6 +510,79 @@ return llmService.streamChat(req, callback);
 | `thinking` | 思考过程 |
 | `message` | 消息片段 (delta) |
 | `finish` | 结束标记 |
+
+---
+
+### 3.7 MCP 模块
+
+#### 3.7.1 模块概述
+
+MCP (Model Context Protocol) 是调用外部工具的标准协议。本系统包含两个模块：
+
+| 模块 | 位置 | 说明 |
+|------|------|------|
+| `bootstrap` | 端口 9090 | RAG 主服务，负责调度和编排 |
+| `mcp-server` | 端口 9099 | 独立 MCP 服务器，执行具体工具 |
+
+#### 3.7.2 调用流程
+
+```
+IntentResolver → 识别 MCP 类型意图
+         │
+         ▼
+LLMMCPParameterExtractor → 从用户问题提取参数
+         │
+         ▼
+MCPRequest { toolId, parameters }
+         │
+         ▼
+HttpMCPClient → JSON-RPC 2.0 请求
+         │
+         ▼
+mcp-server MCPToolExecutor → 执行工具
+         │
+         ▼
+MCPResponse { result: "80" }
+         │
+         ▼
+作为 mcpContext 传入 RAGPromptService
+```
+
+#### 3.7.3 工具注册机制
+
+MCP 工具通过 `@MCPExecutor` 注解自动注册：
+
+```java
+@MCPExecutor(name = "calculator")
+public class CalculatorMCPExecutor implements MCPToolExecutor {
+    // 自动注册到 DefaultMCPToolRegistry
+}
+```
+
+#### 3.7.4 JSON-RPC 2.0 协议
+
+**tools/call 请求**：
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "method": "tools/call",
+  "params": {
+    "name": "calculator",
+    "arguments": { "expression": "100-20" }
+  }
+}
+```
+
+#### 3.7.5 内置 MCP 工具
+
+| 工具 ID | 功能 | 示例 |
+|---------|------|------|
+| `calculator` | 数学计算 | `100-20` → `80` |
+| `hash_tool` | 哈希计算 | `MD5("hello")` |
+| `mysql_query` | 数据库查询 | `SELECT * FROM users` |
+| `mysql_schema` | 获取表结构 | `DESCRIBE users` |
+| `system_health` | 系统健康检查 | CPU/内存/磁盘状态 |
 
 ---
 
@@ -579,143 +630,49 @@ ctx.isEmpty() → 返回 "未检索到相关文档内容"
 │                                                                  │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                  │
-│ 【步骤2】加载对话历史 → MemoryService                              │
-│   MemoryService.load(conversationId, userId)                      │
-│   │                                                               │
-│   ├─▶ MySQLConversationMemorySummaryService.loadLatestSummary()   │
-│   │       → ChatMessage(SYSTEM, "对话摘要：xxx")                  │
-│   │                                                               │
-│   └─▶ MySQLConversationMemoryStore.loadHistory()                  │
-│           → List<ChatMessage> [历史消息...]                        │
-│                                                                  │
-│   合并结果：[摘要SYSTEM, 历史消息1, 2, 3, 4]                       │
-│   追加当前用户消息 → [摘要, 历史, user(当前问题)]                  │
+│ 【步骤2】记忆加载 → MemoryService                                  │
+│   MemoryService.load() → [摘要SYSTEM, 历史消息1, 2, 3, 4]         │
 │                                                                  │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                  │
-│ 【步骤3】查询改写拆分 → MultiQuestionRewriteService                │
-│   QueryRewriteService.rewriteWithSplit(question, history)         │
-│   │                                                               │
-│   ├─▶ QueryTermMappingService.normalize() → 归一化                │
-│   │                                                               │
-│   └─▶ callLLMRewriteAndSplit() → LLM改写                          │
-│           │                                                       │
-│           └─▶ 返回 RewriteResult {                                 │
-│                   rewrite: "请假流程是什么",                      │
-│                   subQuestions: ["请假怎么申请", "请假审批多久"]  │
-│               }                                                   │
+│ 【步骤3】查询改写 → MultiQuestionRewriteService                   │
+│   QueryTermMappingService.normalize() + LLM改写                   │
+│   → RewriteResult { rewrite, subQuestions }                       │
 │                                                                  │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                  │
-│ 【步骤4】意图解析 → IntentResolver                                │
-│   IntentResolver.resolve(rewriteResult)                            │
-│   │                                                               │
-│   ├─▶ 子问题展开                                                  │
-│   │       subQuestions → [子问题A, 子问题B]                       │
-│   │                                                               │
-│   ├─▶ 并行意图分类（intentClassifyExecutor线程池）                │
-│   │       │                                                       │
-│   │       └─▶ DefaultIntentClassifier.classifyTargets()          │
-│   │               │                                              │
-│   │               ├─▶ 从Redis加载意图树（无则从DB加载）           │
-│   │               │                                              │
-│   │               ├─▶ 构建Prompt（所有叶子节点列表）              │
-│   │               │                                              │
-│   │               ├─▶ LLM调用 → JSON数组返回                      │
-│   │               │                                              │
-│   │               └─▶ 解析 → List<NodeScore> 按score降序         │
-│   │                                                               │
-│   ├─▶ 置信度过滤                                                  │
-│   │       过滤 score < 0.4 或超出MAX_INTENT_COUNT(4)              │
-│   │                                                               │
-│   └─▶ 总量管控 capTotalIntents()                                   │
-│           → List<SubQuestionIntent>                               │
+│ 【步骤4】意图分类 → IntentResolver                                 │
+│   子问题展开 → 并行LLM分类 → 置信度过滤 → 总量管控                 │
+│   → List<SubQuestionIntent>                                       │
 │                                                                  │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                  │
-│ 【步骤5】歧义检测 → IntentGuidanceService                         │
-│   IntentGuidanceService.detectAmbiguity(question, subIntents)     │
-│   │                                                               │
-│   └─▶ 检测通过？ → 返回澄清提示，流程中断                         │
+│ 【步骤5】歧义检测 → IntentGuidanceService                          │
+│   检测通过？ → 返回澄清提示，流程中断                             │
 │                                                                  │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                  │
 │ 【步骤6】分流判断                                                 │
-│   IntentResolver.isSystemOnly(subIntents)?                        │
-│   │                                                               │
-│   ├─▶ TRUE → 纯系统意图分支                                       │
-│   │       │                                                       │
-│   │       └─▶ 直接调用LLM回答（不检索）                           │
-│   │                                                               │
-│   └─▶ FALSE → 正常RAG流程                                        │
+│   isSystemOnly? → TRUE → 直接回答                                 │
+│   否则 → 正常RAG流程                                              │
 │                                                                  │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                  │
 │ 【步骤7】检索 → RetrievalEngine                                   │
-│   RetrievalEngine.retrieve(subIntents, topK)                      │
-│   │                                                               │
-│   ├─▶ IntentGroup = IntentResolver.mergeIntentGroup(subIntents)  │
-│   │       │                                                       │
-│   │       ├─▶ mcpIntents  → MCP类型+mcpToolId非空                │
-│   │       └─▶ kbIntents   → KB类型或null                         │
-│   │                                                               │
-│   ├─▶ KB检索 → MultiChannelRetrievalEngine                        │
-│   │       │                                                       │
-│   │       ├─▶ VectorGlobalSearchChannel → Milvus向量检索          │
-│   │       ├─▶ IntentDirectedSearchChannel → 意图导向检索          │
-│   │       └─▶ executePostProcessors()                            │
-│   │               │                                              │
-│   │               ├─▶ RerankPostProcessor（重排序）             │
-│   │               └─▶ DeduplicationPostProcessor（去重）          │
-│   │                                                               │
-│   ├─▶ MCP调用 → MCPToolRegistry                                   │
-│   │       │                                                       │
-│   │       └─▶ 根据mcpToolId调用对应工具                          │
-│   │               返回工具执行结果                                │
-│   │                                                               │
-│   └─▶ 返回 RetrievalContext {                                    │
-│           kbContext: "文档内容...",                              │
-│           mcpContext: "计算结果: 80",                            │
-│           intentChunks: {...}                                     │
-│       }                                                           │
+│   KB检索 → MultiChannelRetrievalEngine → Rerank → 去重           │
+│   MCP调用 → MCPToolRegistry → 工具执行                             │
+│   → RetrievalContext { kbContext, mcpContext }                  │
 │                                                                  │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                  │
-│ 【步骤8】Prompt组装 → RAGPromptService                            │
-│   RAGPromptService.buildStructuredMessages(context, ...)          │
-│   │                                                               │
-│   ├─▶ 场景判断                                                    │
-│   │       │                                                       │
-│   │       ├─▶ hasMcp && !hasKb → MCP_ONLY                        │
-│   │       ├─▶ !hasMcp && hasKb → KB_ONLY                         │
-│   │       └─▶ hasMcp && hasKb   → MIXED                          │
-│   │                                                               │
-│   └─▶ 构建消息列表                                                │
-│           │                                                       │
-│           ├─▶ System: 系统提示词                                  │
-│           ├─▶ System: ## 动态数据片段 + MCP上下文                │
-│           ├─▶ User:  ## 文档内容 + KB上下文                      │
-│           ├─▶ History: 对话历史消息                              │
-│           └─▶ User: 用户问题（多子问题时编号）                   │
+│ 【步骤8】Prompt组装 → RAGPromptService                           │
+│   场景判断 → 选择模板 → 构建消息列表                              │
+│   → List<ChatMessage>                                             │
 │                                                                  │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                  │
 │ 【步骤9】LLM流式输出 → LLMService                                │
-│   LLMService.streamChat(chatRequest, callback)                     │
-│   │                                                               │
-│   ├─▶ 构建ChatRequest                                            │
-│   │       messages: 完整消息列表                                  │
-│   │       temperature: 0~0.7                                     │
-│   │       thinking: deepThinking参数决定                          │
-│   │                                                               │
-│   ├─▶ SSE流式推送                                                │
-│   │       │                                                       │
-│   │       ├─▶ event: meta     → {会话ID, traceId, ...}          │
-│   │       ├─▶ event: thinking → {思考过程}                       │
-│   │       ├─▶ event: message  → {delta: "生成的文字"}           │
-│   │       └─▶ event: finish   → {finish: true}                   │
-│   │                                                               │
-│   └─▶ 任务绑定 → StreamTaskManager.bindHandle(taskId, handle)     │
+│   SSE事件: meta / thinking / message / finish                   │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────────────┘
     │
@@ -730,143 +687,9 @@ SSE 流式响应返回客户端
 | 查询改写 | `RewriteResult` | `rewrittenQuestion`, `subQuestions` |
 | 意图分类 | `NodeScore` | `node: IntentNode`, `score: double` |
 | 意图分类 | `SubQuestionIntent` | `subQuestion: String`, `nodeScores: List<NodeScore>` |
-| 意图分组 | `IntentGroup` | `mcpIntents: List<NodeScore>`, `kbIntents: List<NodeScore>` |
-| 检索结果 | `RetrievalContext` | `kbContext: String`, `mcpContext: String`, `intentChunks: Map` |
-| 检索结果 | `RetrievedChunk` | `content`, `score`, `metadata` |
-| Prompt | `PromptContext` | `question`, `kbContext`, `mcpContext`, `mcpIntents`, `kbIntents` |
-| LLM输入 | `ChatMessage` | `role: USER/ASSISTANT/SYSTEM`, `content: String` |
-| LLM输入 | `ChatRequest` | `messages: List<ChatMessage>`, `temperature`, `thinking` |
-
-### 5.3 分支处理数据流
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    分支判断逻辑                              │
-└─────────────────────────────────────────────────────────────┘
-
-                    ┌─────────────────┐
-                    │ is歧义检测通过? │
-                    └────────┬────────┘
-                             │
-              ┌──────────────┴──────────────┐
-              ▼                             ▼
-           YES                            NO
-              │                             │
-              ▼                             ▼
-    ┌─────────────────┐         ┌─────────────────┐
-    │ 返回歧义提示    │         │ isSystemOnly?    │
-    │ 中断流程       │         └────────┬────────┘
-    └─────────────────┘                  │
-                         ┌──────────────┴──────────────┐
-                         ▼                             ▼
-                      TRUE                          FALSE
-                         │                             │
-                         ▼                             ▼
-               ┌─────────────────┐        ┌─────────────────┐
-               │ 纯系统意图分支   │        │ is检索结果空?   │
-               │ streamSystemR.. │        └────────┬────────┘
-               └─────────────────┘                 │
-                              ┌────────────────────┴────────────────────┐
-                              ▼                                         ▼
-                           YES                                         NO
-                              │                                         │
-                              ▼                                         ▼
-                    ┌─────────────────┐                      ┌─────────────────┐
-                    │ 返回空结果提示  │                      │ 正常RAG流程     │
-                    └─────────────────┘                      │ 检索→Prompt→LLM │
-                                                             └─────────────────┘
-```
-
-### 5.4 MCP工具调用数据流
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                  MCP工具调用流程                            │
-└─────────────────────────────────────────────────────────────┘
-
-IntentGroup.mcpIntents
-       │
-       ▼
-┌─────────────────┐
-│ MCPParameter     │  ← LLM从用户问题中提取工具参数
-│ Extractor       │    (LLMMCPParameterExtractor)
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│ MCPRequest      │  ← { toolId, parameters }
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│ HttpMCPClient   │  ← 发送JSON-RPC 2.0请求
-│ (HTTP + JSON)   │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│ mcp-server      │  ← 独立MCP服务器(端口9099)
-│ MCPToolExecutor │    @MCPExecutor("calculator")
-└────────┬────────┘    执行具体工具逻辑
-         │
-         ▼
-┌─────────────────┐
-│ MCPResponse     │  ← { result: "80" }
-└────────┬────────┘
-         │
-         ▼
-   作为 mcpContext
-   传入 RAGPromptService
-         │
-         ▼
-   最终回答包含工具结果
-```
-
-### 5.5 记忆加载与摘要数据流
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│               记忆加载（每次对话）                           │
-└─────────────────────────────────────────────────────────────┘
-
-DefaultConversationMemoryService.load(conversationId, userId)
-       │
-       ├─▶ 并行加载
-       │       │
-       │       ├─▶ loadLatestSummary()  ──→ ChatMessage(SYSTEM, 摘要内容)
-       │       │                                │
-       │       │                                └─▶ decorateIfNeeded()
-       │       │                                    添加"对话摘要："前缀
-       │       │
-       │       └─▶ loadHistory()      ──→ List<ChatMessage> [历史消息]
-       │
-       └─▶ 合并结果
-               │
-               └─▶ [摘要SYSTEM, 历史消息1, 2, 3, 4]
-
-┌─────────────────────────────────────────────────────────────┐
-│               记忆追加与摘要压缩                           │
-└─────────────────────────────────────────────────────────────┘
-
-DefaultConversationMemoryService.append(conversationId, userId, message)
-       │
-       ├─▶ 保存消息 → MySQL t_message
-       │
-       └─▶ compressIfNeeded()  ──→ 异步检查是否需要摘要
-               │
-               └─▶ doCompressIfNeeded()
-                       │
-                       ├─▶ 获取分布式锁
-                       ├─▶ 统计消息数 >= summaryStartTurns(5)?
-                       ├─▶ 收集 [afterId, cutoffId] 区间消息
-                       ├─▶ summarizeMessages() → LLM生成摘要
-                       │       │
-                       │       └─▶ Prompt: "合并以上对话...输出摘要≤200字符"
-                       │       │
-                       │       └─▶ result: "用户问了3个问题：请假、报销、考勤"
-                       ├─▶ 保存摘要 → MySQL t_conversation_summary
-                       └─▶ 释放分布式锁
-```
+| 意图分组 | `IntentGroup` | `mcpIntents`, `kbIntents` |
+| 检索结果 | `RetrievalContext` | `kbContext`, `mcpContext`, `intentChunks` |
+| Prompt | `PromptContext` | `question`, `kbContext`, `mcpContext` |
 
 ---
 
@@ -886,17 +709,11 @@ rag:
       vectorGlobal:
         confidenceThreshold: 0.6
         topKMultiplier: 3
-        minChunkScore: 0.65
       intentDirected:
         minIntentScore: 0.4
         topKMultiplier: 2
-        minChunkScore: 0.65
-  rateLimit:
-    maxConcurrent: 1
-    leaseSeconds: 30
 
 ai:
   chat:
     defaultModel: qwen-plus-2025-07-28
-    deepThinkingModel: qwen-plus-2025-07-28
 ```
