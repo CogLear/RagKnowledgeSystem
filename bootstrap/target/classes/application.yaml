@@ -127,8 +127,8 @@ ai:
     message-chunk-size: 1
 
   chat:
-    default-model: qwen-plus-2025-07-28
-    deep-thinking-model: qwen-plus-2025-07-28
+    default-model: MiniMax-M2.7-highspeed
+    deep-thinking-model: MiniMax-M2.7
     candidates:
       - id: qwen-plus
         provider: bailian
@@ -138,7 +138,7 @@ ai:
         provider: bailian
         model: qwen-plus-2025-07-28
         supports-thinking: true
-        priority: 0
+        priority: 10
       - id: glm-4.7
         provider: siliconflow
         model: Pro/zai-org/GLM-4.7
@@ -151,7 +151,7 @@ ai:
       - id: minimax-model
         provider: minimax
         model: MiniMax-M2.7
-        priority: 1
+        priority: 0
         enabled: true
 
   embedding:
