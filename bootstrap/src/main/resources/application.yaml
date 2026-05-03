@@ -134,20 +134,23 @@ ai:
         provider: bailian
         model: qwen-plus-latest
         priority: 1
-      - id: glm-4.7
-        provider: siliconflow
-        model: Pro/zai-org/GLM-4.7
-        supports-thinking: true
-        priority: 3
+
       - id: qwen3-local
         provider: ollama
         model: qwen3:8b-fp16
         priority: 2
-      - id: minimax-model
+
+      - id: MiniMax-M2.7
         provider: minimax
         model: MiniMax-M2.7
-        priority: 10
+        priority: 3
         enabled: true
+
+      - id: glm-4.7
+        provider: siliconflow
+        model: Pro/zai-org/GLM-4.7
+        supports-thinking: true
+        priority: 10
 
   embedding:
     default-model: qwen-emb-8b
