@@ -15,7 +15,8 @@
       "Bash(pip show *)",
       "Bash(python scripts/rag_evaluator.py)",
       "Bash(python -c ' *)",
-      "Bash(mvn clean *)"
+      "Bash(mvn clean *)",
+      "Bash(npm install *)"
     ],
     "additionalDirectories": [
       "D:\\apache-maven-3.9.15\\conf",
