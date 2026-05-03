@@ -4,11 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="94bb44ff-cfc3-4ab9-90c9-10843f4b1508" name="更改" comment="调试模型速度">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bootstrap/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/src/main/resources/application.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/infra-ai/src/main/java/com/rks/infra/chat/MinMaxChatClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/infra-ai/src/main/java/com/rks/infra/chat/MinMaxChatClient.java" afterDir="false" />
-    </list>
+    <list default="true" id="94bb44ff-cfc3-4ab9-90c9-10843f4b1508" name="更改" comment="模型速度调用" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -381,7 +377,15 @@
       <option name="project" value="LOCAL" />
       <updated>1777798452108</updated>
     </task>
-    <option name="localTasksCounter" value="36" />
+    <task id="LOCAL-00036" summary="模型速度调用">
+      <option name="closed" value="true" />
+      <created>1777800137236</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1777800137236</updated>
+    </task>
+    <option name="localTasksCounter" value="37" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -439,7 +443,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="初次提交" />
     <MESSAGE value="修复对话框删除bug" />
     <MESSAGE value="前端调整" />
     <MESSAGE value="guest不能修改密码" />
@@ -464,7 +467,8 @@
     <MESSAGE value="完成TODO" />
     <MESSAGE value="修复没有对话记忆" />
     <MESSAGE value="调试模型速度" />
-    <option name="LAST_COMMIT_MESSAGE" value="调试模型速度" />
+    <MESSAGE value="模型速度调用" />
+    <option name="LAST_COMMIT_MESSAGE" value="模型速度调用" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
