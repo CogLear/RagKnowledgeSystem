@@ -66,17 +66,17 @@ public class MySQLConversationMemoryStore implements ConversationMemoryStore {
      */
     @Override
     public List<ChatMessage> loadHistory(String conversationId, String userId) {
-        // ========== 步骤1：数量限制解析 ==========
-        // 根据配置计算最大加载消息数
-        // 每个对话轮次包含 1 条 USER 消息 + 1 条 ASSISTANT 消息 = 2 条
-        int maxMessages = resolveMaxHistoryMessages();
+        log.info("[Memory] loadHistory - conversationId: {}, userId: {}, maxMessages: {}",
+                conversationId, userId, resolveMaxHistoryMessages());
 
+        int maxMessages = resolveMaxHistoryMessages();
         // ========== 步骤2：数据库查询 ==========
         // 倒序加载消息（最新的在前），取前 maxMessages 条
         List<ConversationMessageVO> dbMessages = conversationMessageService.listMessages(
                 conversationId,
                 maxMessages,
-                ConversationMessageOrder.DESC
+                ConversationMessageOrder.DESC,
+                userId
         );
         if (CollUtil.isEmpty(dbMessages)) {
             return List.of();
@@ -125,6 +125,9 @@ public class MySQLConversationMemoryStore implements ConversationMemoryStore {
      */
     @Override
     public Long append(String conversationId, String userId, ChatMessage message) {
+        log.info("[Memory] append - conversationId: {}, userId: {}, role: {}, contentLen: {}",
+                conversationId, userId, message.getRole(), message.getContent() != null ? message.getContent().length() : 0);
+
         // ========== 步骤1：消息构建 ==========
         // 将 ChatMessage 转换为数据库记录格式
         ConversationMessageBO conversationMessage = ConversationMessageBO.builder()

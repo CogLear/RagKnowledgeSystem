@@ -4,10 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="94bb44ff-cfc3-4ab9-90c9-10843f4b1508" name="更改" comment="深度思考修复">
+    <list default="true" id="94bb44ff-cfc3-4ab9-90c9-10843f4b1508" name="更改" comment="完成TODO">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/rag/core/retrieve/MilvusRetrieverService.java" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/rag/core/retrieve/MilvusRetrieverService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/rag/core/retrieve/RetrieveRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/rag/core/retrieve/RetrieveRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/rag/core/memory/MySQLConversationMemoryStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/rag/core/memory/MySQLConversationMemoryStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/rag/service/ConversationMessageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/rag/service/ConversationMessageService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/rag/service/impl/ConversationMessageServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/rag/service/impl/ConversationMessageServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/rag/service/impl/RAGChatServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/rag/service/impl/RAGChatServiceImpl.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -341,7 +343,15 @@
       <option name="project" value="LOCAL" />
       <updated>1777778231845</updated>
     </task>
-    <option name="localTasksCounter" value="31" />
+    <task id="LOCAL-00031" summary="完成TODO">
+      <option name="closed" value="true" />
+      <created>1777793792983</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1777793792983</updated>
+    </task>
+    <option name="localTasksCounter" value="32" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -421,7 +431,8 @@
     <MESSAGE value="添加注释" />
     <MESSAGE value="修复MinMax模型客户端的chat问题" />
     <MESSAGE value="深度思考修复" />
-    <option name="LAST_COMMIT_MESSAGE" value="深度思考修复" />
+    <MESSAGE value="完成TODO" />
+    <option name="LAST_COMMIT_MESSAGE" value="完成TODO" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

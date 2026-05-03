@@ -135,7 +135,10 @@ public class RAGChatServiceImpl implements RAGChatService {
 
         // 4. 加载对话历史
         String userId = UserContext.getUserId();
+        log.info("[Chat] streamChat - userId: {}, conversationId: {}, question: {}",
+                userId, actualConversationId, question.substring(0, Math.min(question.length(), 50)));
         List<ChatMessage> history = memoryService.loadAndAppend(actualConversationId, userId, ChatMessage.user(question));
+        log.info("[Chat] history loaded - size: {}", history.size());
 
         // 5. 查询改写和拆分
         RewriteResult rewriteResult = queryRewriteService.rewriteWithSplit(question, history);

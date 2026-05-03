@@ -4,7 +4,6 @@ package com.rks.rag.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.rks.framework.context.UserContext;
 import com.rks.rag.controller.vo.ConversationMessageVO;
 import com.rks.rag.dao.entity.ConversationDO;
 import com.rks.rag.dao.entity.ConversationMessageDO;
@@ -18,6 +17,7 @@ import com.rks.rag.service.MessageFeedbackService;
 import com.rks.rag.service.bo.ConversationMessageBO;
 import com.rks.rag.service.bo.ConversationSummaryBO;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -42,6 +42,7 @@ import java.util.Map;
  *
  * @see ConversationMessageService
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ConversationMessageServiceImpl implements ConversationMessageService {
@@ -87,8 +88,9 @@ public class ConversationMessageServiceImpl implements ConversationMessageServic
      * @return 消息列表（包含投票状态）
      */
     @Override
-    public List<ConversationMessageVO> listMessages(String conversationId, Integer limit, ConversationMessageOrder order) {
-        String userId = UserContext.getUserId();
+    public List<ConversationMessageVO> listMessages(String conversationId, Integer limit, ConversationMessageOrder order, String userId) {
+        log.info("[Message] listMessages - conversationId: {}, userId: {}, limit: {}, order: {}",
+                conversationId, userId, limit, order);
         if (StrUtil.isBlank(conversationId) || StrUtil.isBlank(userId)) {
             return List.of();
         }

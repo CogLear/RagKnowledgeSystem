@@ -58,7 +58,7 @@ public interface ConversationMessageService {
      * @param order          排序方式（ASC 正序/DESC 倒序）
      * @return 消息列表（包含投票状态）
      */
-    List<ConversationMessageVO> listMessages(String conversationId, Integer limit, ConversationMessageOrder order);
+    List<ConversationMessageVO> listMessages(String conversationId, Integer limit, ConversationMessageOrder order, String userId);
 
     /**
      * 添加对话摘要

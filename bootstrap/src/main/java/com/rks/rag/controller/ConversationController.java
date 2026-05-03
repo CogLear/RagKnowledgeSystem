@@ -92,6 +92,6 @@ public class ConversationController {
      */
     @GetMapping("/conversations/{conversationId}/messages")
     public Result<List<ConversationMessageVO>> listMessages(@PathVariable String conversationId) {
-        return Results.success(conversationMessageService.listMessages(conversationId, null, ConversationMessageOrder.ASC));
+        return Results.success(conversationMessageService.listMessages(conversationId, null, ConversationMessageOrder.ASC, UserContext.getUserId()));
     }
 }
