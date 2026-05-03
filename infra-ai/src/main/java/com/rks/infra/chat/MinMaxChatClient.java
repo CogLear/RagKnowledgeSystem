@@ -103,15 +103,16 @@ public class MinMaxChatClient implements ChatClient {
     @RagTraceNode(name = "minimax-stream-chat", type = "LLM_PROVIDER")
     public StreamCancellationHandle streamChat(ChatRequest request, StreamCallback callback, ModelTarget target) {
         Call call = httpClient.newCall(buildStreamRequest(request, target));
+        boolean reasoningEnabled = Boolean.TRUE.equals(request.getThinking());
         return StreamAsyncExecutor.submit(
                 modelStreamExecutor,
                 call,
                 callback,
-                cancelled -> doStream(call, callback, cancelled)
+                cancelled -> doStream(call, callback, cancelled, reasoningEnabled)
         );
     }
 
-    private void doStream(Call call, StreamCallback callback, AtomicBoolean cancelled) {
+    private void doStream(Call call, StreamCallback callback, AtomicBoolean cancelled, boolean reasoningEnabled) {
         try (Response response = call.execute()) {
             if (!response.isSuccessful()) {
                 String body = readBody(response.body());
@@ -137,7 +138,10 @@ public class MinMaxChatClient implements ChatClient {
                 }
 
                 try {
-                    OpenAIStyleSseParser.ParsedEvent event = OpenAIStyleSseParser.parseLine(line, gson, false);
+                    OpenAIStyleSseParser.ParsedEvent event = OpenAIStyleSseParser.parseLine(line, gson, reasoningEnabled);
+                    if (event.hasReasoning()) {
+                        callback.onThinking(event.reasoning());
+                    }
                     if (event.hasContent()) {
                         callback.onContent(event.content());
                     }
