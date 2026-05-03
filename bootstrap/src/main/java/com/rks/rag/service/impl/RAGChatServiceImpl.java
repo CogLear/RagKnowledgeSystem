@@ -162,7 +162,7 @@ public class RAGChatServiceImpl implements RAGChatService {
                     .filter(StrUtil::isNotBlank)
                     .findFirst()
                     .orElse(null);
-            StreamCancellationHandle handle = streamSystemResponse(rewriteResult.rewrittenQuestion(), history, customPrompt, callback);
+            StreamCancellationHandle handle = streamSystemResponse(rewriteResult.rewrittenQuestion(), history, customPrompt, thinkingEnabled, callback);
             taskManager.bindHandle(taskId, handle);
             return;
         }
@@ -224,7 +224,8 @@ public class RAGChatServiceImpl implements RAGChatService {
      * @return 取消句柄
      */
     private StreamCancellationHandle streamSystemResponse(String question, List<ChatMessage> history,
-                                                          String customPrompt, StreamCallback callback) {
+                                                          String customPrompt, boolean thinkingEnabled,
+                                                          StreamCallback callback) {
         // 加载系统提示词
         String systemPrompt = StrUtil.isNotBlank(customPrompt)
                 ? customPrompt
@@ -242,7 +243,7 @@ public class RAGChatServiceImpl implements RAGChatService {
         ChatRequest req = ChatRequest.builder()
                 .messages(messages)
                 .temperature(0.7D)
-                .thinking(false)
+                .thinking(thinkingEnabled)
                 .build();
         return llmService.streamChat(req, callback);
     }
