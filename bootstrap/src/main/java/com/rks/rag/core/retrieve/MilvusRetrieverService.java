@@ -200,8 +200,6 @@ public class MilvusRetrieverService implements RetrieverService {
         // 将 Milvus 的 Entity 映射为框架的 RetrievedChunk 对象
         // r.getScore() 是相似度分数（距离或相似度，取决于 metric_type）
         //
-        // TODO: 考虑对低分结果进行过滤（如 score < 0.65）
-        // TODO: 如果高分结果多，可考虑扩大搜索范围
         return results.get(0).stream()
                 .map(r -> new RetrievedChunk(
                         // doc_id: 文档唯一标识
@@ -210,6 +208,7 @@ public class MilvusRetrieverService implements RetrieverService {
                         Objects.toString(r.getEntity().get("content"), ""),
                         // score: 相似度分数
                         r.getScore()))
+                .filter(chunk -> chunk.getScore() >= retrieveParam.getMinScore())
                 .collect(Collectors.toList());
     }
 

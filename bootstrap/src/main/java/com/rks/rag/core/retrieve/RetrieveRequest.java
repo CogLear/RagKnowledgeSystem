@@ -48,5 +48,13 @@ public class RetrieveRequest {
      * {"biz_type": "ATTENDANCE", "env": "TEST"}
      */
     private Map<String, Object> metadataFilters;
+
+    /**
+     * 最小分数阈值
+     * 低于此分数的结果将被过滤
+     * 默认 -1 表示不过滤
+     */
+    @Builder.Default
+    private float minScore = -1f;
 }
 

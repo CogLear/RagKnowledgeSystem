@@ -5,7 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="94bb44ff-cfc3-4ab9-90c9-10843f4b1508" name="更改" comment="深度思考修复">
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/chat/ThinkingIndicator.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/chat/ThinkingIndicator.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/rag/core/retrieve/MilvusRetrieverService.java" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/rag/core/retrieve/MilvusRetrieverService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/rag/core/retrieve/RetrieveRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/rag/core/retrieve/RetrieveRequest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
