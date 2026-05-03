@@ -114,10 +114,10 @@ ai:
         chat: /v1/chat/completions
         embedding: /v1/embeddings
     minimax:
-      url: https://api.minimax.chat
+      url: https://api.minimaxi.com
       api-key: ${MINIMAX_API_KEY}
       endpoints:
-        chat: /v1/chat/completions
+        chat: /v1/text/chatcompletion_v2
 
   selection:
     failure-threshold: 2
@@ -127,7 +127,7 @@ ai:
     message-chunk-size: 1
 
   chat:
-    default-model: MiniMax-M2.7-highspeed
+    default-model: MiniMax-M2.7
     deep-thinking-model: MiniMax-M2.7
     candidates:
       - id: qwen-plus
