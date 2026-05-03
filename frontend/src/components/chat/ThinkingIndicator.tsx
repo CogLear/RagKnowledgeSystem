@@ -1,6 +1,7 @@
 import { Brain, Loader2 } from "lucide-react";
 
 import { useChatThemeStore } from "@/stores/chatThemeStore";
+import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/lib/utils";
 
 interface ThinkingIndicatorProps {
@@ -10,6 +11,7 @@ interface ThinkingIndicatorProps {
 
 export function ThinkingIndicator({ content, duration }: ThinkingIndicatorProps) {
   const { theme } = useChatThemeStore();
+  const { isDark } = useTheme();
   const isAurora = theme === "aurora";
 
   return (
@@ -18,7 +20,9 @@ export function ThinkingIndicator({ content, duration }: ThinkingIndicatorProps)
         "max-w-[85%] rounded-xl border-2",
         isAurora
           ? "border-purple-500/50 bg-purple-500/10"
-          : "border-[var(--neo-dark)] bg-[var(--neo-white)]"
+          : isDark
+            ? "border-[var(--neo-white)] bg-[#1a1a2e]"
+            : "border-[var(--neo-dark)] bg-[var(--neo-white)]"
       )}
       style={{ transition: "none" }}
     >
@@ -36,7 +40,7 @@ export function ThinkingIndicator({ content, duration }: ThinkingIndicatorProps)
         <div
           className={cn(
             "flex items-center gap-2",
-            isAurora ? "text-purple-300" : "text-[var(--neo-dark)]"
+            isAurora ? "text-purple-300" : isDark ? "text-white" : "text-[var(--neo-dark)]"
           )}
         >
           <Loader2 className="h-4 w-4" />
@@ -47,7 +51,9 @@ export function ThinkingIndicator({ content, duration }: ThinkingIndicatorProps)
                 "text-xs px-2 py-0.5 rounded-full",
                 isAurora
                   ? "bg-purple-500/30 text-purple-300"
-                  : "bg-[var(--neo-yellow)] text-[var(--neo-dark)]"
+                  : isDark
+                    ? "bg-[var(--neo-yellow)]/30 text-[var(--neo-yellow)]"
+                    : "bg-[var(--neo-yellow)] text-[var(--neo-dark)]"
               )}
             >
               {duration}秒
@@ -57,13 +63,13 @@ export function ThinkingIndicator({ content, duration }: ThinkingIndicatorProps)
         <div
           className={cn(
             "mt-3 flex items-start gap-2 text-sm",
-            isAurora ? "text-purple-200/80" : "text-[var(--neo-dark)]/80"
+            isAurora ? "text-purple-200/80" : isDark ? "text-white/80" : "text-[var(--neo-dark)]/80"
           )}
         >
           <Brain
             className={cn(
               "mt-0.5 h-4 w-4 shrink-0 brain-icon",
-              isAurora ? "text-purple-400" : "text-[var(--neo-pink)]"
+              isAurora ? "text-purple-400" : isDark ? "text-[var(--neo-pink)]" : "text-[var(--neo-pink)]"
             )}
           />
           <p className="whitespace-pre-wrap leading-relaxed">
