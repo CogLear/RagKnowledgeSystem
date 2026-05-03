@@ -4,10 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="94bb44ff-cfc3-4ab9-90c9-10843f4b1508" name="更改" comment="修复没有对话记忆">
+    <list default="true" id="94bb44ff-cfc3-4ab9-90c9-10843f4b1508" name="更改" comment="调试模型速度">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bootstrap/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/src/main/resources/application.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bootstrap/target/classes/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/target/classes/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infra-ai/src/main/java/com/rks/infra/chat/MinMaxChatClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/infra-ai/src/main/java/com/rks/infra/chat/MinMaxChatClient.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -357,7 +357,31 @@
       <option name="project" value="LOCAL" />
       <updated>1777796445094</updated>
     </task>
-    <option name="localTasksCounter" value="33" />
+    <task id="LOCAL-00033" summary="调试模型速度">
+      <option name="closed" value="true" />
+      <created>1777798314956</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1777798314956</updated>
+    </task>
+    <task id="LOCAL-00034" summary="调试模型速度">
+      <option name="closed" value="true" />
+      <created>1777798328851</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1777798328851</updated>
+    </task>
+    <task id="LOCAL-00035" summary="调试模型速度">
+      <option name="closed" value="true" />
+      <created>1777798452108</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1777798452108</updated>
+    </task>
+    <option name="localTasksCounter" value="36" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -439,7 +463,8 @@
     <MESSAGE value="深度思考修复" />
     <MESSAGE value="完成TODO" />
     <MESSAGE value="修复没有对话记忆" />
-    <option name="LAST_COMMIT_MESSAGE" value="修复没有对话记忆" />
+    <MESSAGE value="调试模型速度" />
+    <option name="LAST_COMMIT_MESSAGE" value="调试模型速度" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

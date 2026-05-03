@@ -3,6 +3,7 @@ package com.rks.infra.chat;
 import cn.hutool.core.collection.CollUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.rks.framework.convention.ChatRequest;
 import com.rks.framework.trace.RagTraceNode;
@@ -257,7 +258,12 @@ public class MinMaxChatClient implements ChatClient {
         if (respJson == null || !respJson.has("choices")) {
             throw new ModelClientException("MiniMax响应缺少 choices", ModelClientErrorType.INVALID_RESPONSE, null);
         }
-        JsonArray choices = respJson.getAsJsonArray("choices");
+        JsonElement choicesElement = respJson.get("choices");
+        if (choicesElement == null || !choicesElement.isJsonArray()) {
+            log.warn("MiniMax响应 choices 无效: {}", respJson);
+            throw new ModelClientException("MiniMax响应 choices 无效", ModelClientErrorType.INVALID_RESPONSE, null);
+        }
+        JsonArray choices = choicesElement.getAsJsonArray();
         if (choices == null || choices.isEmpty()) {
             throw new ModelClientException("MiniMax响应 choices 为空", ModelClientErrorType.INVALID_RESPONSE, null);
         }
