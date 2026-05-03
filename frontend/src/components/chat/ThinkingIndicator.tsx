@@ -15,7 +15,7 @@ export function ThinkingIndicator({ content, duration }: ThinkingIndicatorProps)
   return (
     <div
       className={cn(
-        "overflow-hidden rounded-xl border-2",
+        "max-w-[85%] rounded-xl border-2",
         isAurora
           ? "border-purple-500/50 bg-purple-500/10"
           : "border-[var(--neo-dark)] bg-[var(--neo-white)]"

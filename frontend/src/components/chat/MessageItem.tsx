@@ -52,7 +52,7 @@ export const MessageItem = React.memo(function MessageItem({ message, isLast }: 
         {!isThinking && hasThinking ? (
           <div
             className={cn(
-              "overflow-hidden rounded-xl border-2",
+              "max-w-[85%] rounded-xl border-2",
               isDark ? "border-[var(--neo-white)]" : "border-[var(--neo-dark)]"
             )}
             style={{ transition: "none" }}
