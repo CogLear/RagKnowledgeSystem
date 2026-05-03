@@ -4,12 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="94bb44ff-cfc3-4ab9-90c9-10843f4b1508" name="更改" comment="完成TODO">
+    <list default="true" id="94bb44ff-cfc3-4ab9-90c9-10843f4b1508" name="更改" comment="修复没有对话记忆">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/rag/core/memory/MySQLConversationMemoryStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/rag/core/memory/MySQLConversationMemoryStore.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/rag/service/ConversationMessageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/rag/service/ConversationMessageService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/rag/service/impl/ConversationMessageServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/rag/service/impl/ConversationMessageServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/rag/service/impl/RAGChatServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/rag/service/impl/RAGChatServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bootstrap/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/src/main/resources/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bootstrap/target/classes/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/target/classes/application.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -351,7 +349,15 @@
       <option name="project" value="LOCAL" />
       <updated>1777793792983</updated>
     </task>
-    <option name="localTasksCounter" value="32" />
+    <task id="LOCAL-00032" summary="修复没有对话记忆">
+      <option name="closed" value="true" />
+      <created>1777796445094</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1777796445094</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -432,7 +438,8 @@
     <MESSAGE value="修复MinMax模型客户端的chat问题" />
     <MESSAGE value="深度思考修复" />
     <MESSAGE value="完成TODO" />
-    <option name="LAST_COMMIT_MESSAGE" value="完成TODO" />
+    <MESSAGE value="修复没有对话记忆" />
+    <option name="LAST_COMMIT_MESSAGE" value="修复没有对话记忆" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
