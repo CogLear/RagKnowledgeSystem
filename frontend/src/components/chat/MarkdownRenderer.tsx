@@ -142,7 +142,7 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
           }
         }
       }}
-      className="prose prose-gray max-w-none dark:prose-invert"
+      className="prose prose-gray max-w-none dark:prose-invert dark:text-gray-200"
     >
       {content}
     </Markdown>
