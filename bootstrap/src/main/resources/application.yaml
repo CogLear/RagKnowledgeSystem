@@ -153,6 +153,7 @@ ai:
         model: MiniMax-M2.7
         priority: 0
         enabled: true
+        supports-thinking: true
 
   embedding:
     default-model: qwen-emb-8b

@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="94bb44ff-cfc3-4ab9-90c9-10843f4b1508" name="更改" comment="修复MinMax模型客户端的chat问题" />
+    <list default="true" id="94bb44ff-cfc3-4ab9-90c9-10843f4b1508" name="更改" comment="修复MinMax模型客户端的chat问题">
+      <change beforePath="$PROJECT_DIR$/bootstrap/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/src/main/resources/application.yaml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
