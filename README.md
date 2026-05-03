@@ -4,14 +4,17 @@
 
 ## 功能特性
 
-- **智能问答**: 基于知识库和对话历史的 RAG 问答
+- **智能问答**: 基于知识库和对话历史的 RAG 问答，支持流式 SSE 响应
 - **多知识库管理**: 支持多个独立的知识库，每个知识库有独立的向量空间
-- **意图分类**: 可配置的意图树，支持 KB/MCP/SYSTEM 三种意图类型
+- **意图分类**: 三级意图树（DOMAIN → CATEGORY → TOPIC），支持 KB/MCP/SYSTEM 三种意图类型
+- **歧义检测**: 自动检测用户查询的歧义，引导用户澄清
 - **文档摄取**: 支持 PDF、Word、Markdown、TXT 等格式的文档自动解析和分块
+- **多路召回 + 重排序**: 向量检索 + 意图导向检索联合查询，GTE-Rerank 重排序
 - **MCP 工具集成**: 可扩展的 MCP 工具执行框架，支持调用外部工具
-- **流式响应**: SSE 流式输出，支持思考过程展示
+- **对话记忆管理**: 支持历史消息摘要，自动裁剪保持对话上下文
+- **分布式限流**: 基于 Redisson 的分布式租约控制并发
 - **RAG 链路追踪**: 完整的请求链路追踪，方便调试和优化
-- **管理后台**: 完整的知识库、意图、用户管理界面
+- **管理后台**: 完整的知识库、意图、用户管理和仪表盘
 
 ## 技术栈
 
@@ -41,18 +44,30 @@
 
 ### 基础设施
 
-| 组件 | 端口 | 用途 |
+| 组件 | 地址 | 用途 |
 |------|------|------|
-| MySQL | 3306 | 关系数据存储 |
-| Redis | 6379 | 缓存/会话/锁 |
-| Milvus | 19530 | 向量存储和检索 |
-| RustFS (S3) | 9000 | 文件存储 |
+| MySQL | 127.0.0.1:3306/ragsystem | 关系数据存储 |
+| Redis | 127.0.0.1:6379 (密码: 123456) | 缓存/会话/锁 |
+| Milvus | localhost:19530 | 向量存储和检索 |
+| RustFS (S3) | localhost:9000 | 文件存储 |
+
+### AI 提供商
+
+| 提供商 | 默认模型 | 用途 |
+|--------|---------|------|
+| bailian (阿里云 DashScope) | qwen-plus-2025-07-28 | 聊天 |
+| ollama | - | 本地 LLM |
+| siliconflow | - | 第三方 API |
+| minimax | - | MiniMax API |
+
+Embedding 模型: `qwen-emb-8b`
+Rerank 模型: `gte-rerank-v2`
 
 ## 项目结构
 
 ```
-RagKnowledgeSystem
-├── bootstrap/          # Spring Boot 主应用
+RagKnowledgeSystem/
+├── bootstrap/          # Spring Boot 主应用 (端口 9090)
 │   └── src/main/java/com/rks/
 │       ├── rag/        # RAG 核心模块
 │       │   ├── core/   # 核心组件
@@ -60,20 +75,20 @@ RagKnowledgeSystem
 │       │   │   ├── memory/     # 对话记忆
 │       │   │   ├── mcp/        # MCP 工具执行
 │       │   │   ├── prompt/     # Prompt 构建
-│       │   │   ├── retrieve/   # 检索引擎
-│       │   │   ├── rewrite/   # 查询改写
-│       │   │   └── vector/    # 向量存储
-│       │   ├── controller/    # REST API
-│       │   └── service/       # 业务服务
-│       ├── knowledge/  # 知识库管理
-│       ├── ingestion/  # 文档摄取
+│       │   │   ├── retrieve/   # 检索引擎 (多路召回)
+│       │   │   ├── rewrite/    # 查询改写
+│       │   │   └── vector/     # 向量存储
+│       │   ├── controller/     # REST API
+│       │   └── service/        # 业务服务
+│       ├── knowledge/  # 知识库管理 CRUD
+│       ├── ingestion/ # 文档摄取流水线 (Fetcher→Parser→Chunker→Indexer)
 │       ├── user/      # 用户管理
 │       └── admin/     # 管理后台 API
-├── framework/         # 共享基础设施模块
-├── infra-ai/          # AI 提供商集成模块
+├── framework/         # 共享基础设施 (DB 实体、Redis 工具)
+├── infra-ai/          # AI 提供商集成 (DashScope、Ollama、SiliconFlow、MiniMax)
 ├── mcp-server/        # 独立 MCP 服务器 (端口 9099)
-└── frontend/          # React 前端应用
-```
+├── frontend/          # React 前端应用
+└── docs/              # 架构文档
 
 ## 快速开始
 
@@ -82,25 +97,22 @@ RagKnowledgeSystem
 - JDK 17+
 - Node.js 18+
 - Maven 3.8+
-- MySQL 8.0+
-- Redis 6.0+
+- MySQL 8.0+ (数据库名: `ragsystem`，用户: `root`，密码: `123456`)
+- Redis 6.0+ (密码: `123456`)
 - Milvus 2.4+
 - RustFS 或 MinIO (S3 兼容存储)
 
 ### 后端启动
 
 ```bash
-# 1. 初始化数据库
-mysql -u root -p < scripts/init.sql
-
-# 2. 配置环境变量
+# 1. 配置环境变量
 export BAILLIAN_API_KEY=your_api_key
 export SILICONFLOW_API_KEY=your_api_key
 
-# 3. 构建项目
+# 2. 构建项目（跳过测试）
 mvn clean package -DskipTests
 
-# 4. 启动后端服务
+# 3. 启动后端服务
 cd bootstrap && mvn spring-boot:run
 ```
 
@@ -118,7 +130,13 @@ npm install
 npm run dev
 ```
 
-前端启动在 `http://localhost:5173`，会自动代理 `/api` 请求到后端。
+前端启动在 `http://localhost:5173`，Vite 开发服务器会自动代理 `/api` 请求到后端 `http://localhost:9090`。
+
+访问前端：
+- `/` → 重定向到 `/chat`
+- `/login` → 用户登录
+- `/chat` → AI 聊天页面
+- `/admin` → 管理后台（知识库、意图树、链路追踪等）
 
 ### MCP 服务器启动（可选）
 
@@ -146,7 +164,7 @@ MCP 服务器启动在 `http://localhost:9099`
       │
       ▼
 ┌──────────────────┐
-│ IntentClassifier │  意图分类 (KB/MCP/SYSTEM)
+│ IntentClassifier │  三级意图分类 (KB/MCP/SYSTEM)
 └──────────────────┘
       │
       ▼
@@ -157,23 +175,27 @@ MCP 服务器启动在 `http://localhost:9099`
       │ 无歧义
       ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                   RetrievalEngine                          │
-│  ┌─────────────────────┐    ┌─────────────────────────┐   │
-│  │ KB 意图              │    │ MCP 意图                 │   │
-│  │ MultiChannelRetrieval│    │ RemoteMCPToolExecutor   │   │
-│  │ → Milvus Vector Search│   │ → MCP Server 调用       │   │
-│  └─────────────────────┘    └─────────────────────────┘   │
+│                   MultiChannelRetrieval                     │
+│  ┌─────────────────────────────────────────────────────┐  │
+│  │ VectorGlobalSearchChannel     │ IntentDirectedSearch │  │
+│  │ → Milvus 向量检索              │ → 意图导向检索      │  │
+│  └─────────────────────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────────┘
+      │ 多路召回结果
+      ▼
+┌──────────────────┐
+│ RerankPostProcessor │  GTE-Rerank 重排序
+└──────────────────┘
       │
       ▼
 ┌──────────────────┐
 │  PromptBuilder    │  组装最终 Prompt
-│  RAGPromptService │  System + MCP Context + KB Context + History
+│  RAGPromptService │  System + KB Context + History
 └──────────────────┘
       │
       ▼
 ┌──────────────┐
-│ LLM Generate │  流式调用 LLM
+│ LLM Generate │  流式调用 LLM (SSE)
 └──────────────┘
       │
       ▼
@@ -288,7 +310,7 @@ MCP 服务器启动在 `http://localhost:9099`
       ▼
   ┌─────────────────────┐
   │ 加载对话历史         │
-  │ MySQL (t_message)    │
+  │ t_message 表         │
   └─────────────────────┘
       │
       ▼
@@ -296,7 +318,7 @@ MCP 服务器启动在 `http://localhost:9099`
   │ 摘要装饰             │
   │ 当消息数 >= 5 时     │
   │ 自动生成摘要         │
-  │ (t_conversation_summary)
+  │ t_conversation_summary │
   └─────────────────────┘
       │
       ▼
@@ -311,72 +333,20 @@ MCP 服务器启动在 `http://localhost:9099`
 
 ### 核心表结构
 
-#### 会话表 (t_conversation)
+| 表名 | 说明 |
+|------|------|
+| t_conversation | 会话表 |
+| t_message | 消息表 |
+| t_knowledge_base | 知识库表 |
+| t_knowledge_document | 文档表 |
+| t_knowledge_chunk | 知识块表 |
+| t_intent_node | 意图节点表 |
+| t_ingestion_pipeline | 摄取流水线定义表 |
+| t_ingestion_task | 摄取任务表 |
+| t_query_term_mapping | 查询术语映射表 |
+| t_conversation_summary | 对话摘要表 |
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| id | BIGINT | 主键 |
-| conversation_id | VARCHAR(64) | 会话唯一 ID |
-| user_id | VARCHAR(64) | 用户 ID |
-| title | VARCHAR(255) | 会话标题 |
-| last_time | DATETIME | 最后活跃时间 |
-| deleted | INT | 逻辑删除标记 |
-
-#### 消息表 (t_message)
-
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| id | BIGINT | 主键 |
-| conversation_id | VARCHAR(64) | 关联会话 ID |
-| user_id | VARCHAR(64) | 用户 ID |
-| role | VARCHAR(20) | 角色 (user/assistant) |
-| content | TEXT | 消息内容 |
-| vote | INT | 反馈 (1/-1/null) |
-
-#### 知识库表 (t_knowledge_base)
-
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| id | BIGINT | 主键 |
-| name | VARCHAR(255) | 知识库名称 |
-| embedding_model | VARCHAR(64) | Embedding 模型 |
-| collection_name | VARCHAR(128) | Milvus Collection 名 |
-| dimension | INT | 向量维度 |
-
-#### 文档表 (t_knowledge_document)
-
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| id | BIGINT | 主键 |
-| kb_id | BIGINT | 关联知识库 ID |
-| doc_name | VARCHAR(255) | 文档名称 |
-| file_url | VARCHAR(512) | 文件存储路径 |
-| status | VARCHAR(32) | 处理状态 |
-| chunk_count | INT | 分块数量 |
-
-#### 意图节点表 (t_intent_node)
-
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| id | BIGINT | 主键 |
-| intent_code | VARCHAR(64) | 意图唯一编码 |
-| name | VARCHAR(128) | 意图名称 |
-| level | INT | 层级 (0/1/2) |
-| parent_code | VARCHAR(64) | 父节点编码 |
-| kind | INT | 类型 (0=KB, 1=SYSTEM, 2=MCP) |
-| mcp_tool_id | VARCHAR(64) | MCP 工具 ID |
-| top_k | INT | 检索 TopK |
-| prompt_template | TEXT | Prompt 模板 |
-
-#### 查询术语映射表 (t_query_term_mapping)
-
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| id | BIGINT | 主键 |
-| source_term | VARCHAR(128) | 源术语 |
-| target_term | VARCHAR(128) | 目标术语 |
-| match_type | INT | 匹配类型 |
-| priority | INT | 优先级 |
+详情见 `docs/RAG后端流程详解.md`。
 
 ## API 参考
 
@@ -470,9 +440,20 @@ rag:
   query-rewrite:
     enabled: true
     max-history-messages: 4
+    max-history-chars: 500
+  cache:
+    retrieval:
+      enabled: true
+      ttl-minutes: 10
+  rate-limit:
+    global:
+      enabled: true
+      max-concurrent: 1
+      lease-seconds: 30
   memory:
     history-keep-turns: 4
     summary-start-turns: 5
+    summary-enabled: true
 
 # AI 提供商配置
 ai:
@@ -485,8 +466,10 @@ ai:
     siliconflow:
       url: https://api.siliconflow.cn
       api-key: ${SILICONFLOW_API_KEY}
+    minimax:
+      url: https://api.minimaxi.com
   default-provider: bailian
-  default-model: qwen-plus
+  default-model: qwen-plus-2025-07-28
 
 # S3 存储配置
 rustfs:
@@ -501,9 +484,8 @@ rustfs:
 |------|------|------|
 | BAILLIAN_API_KEY | 阿里云 DashScope API Key | 是 |
 | SILICONFLOW_API_KEY | SiliconFlow API Key | 是 |
+| MINIMAX_API_KEY | MiniMax API Key | 否 |
 | MILVUS_URI | Milvus 服务地址 | 否 |
-| REDIS_HOST | Redis 主机 | 否 |
-| MYSQL_HOST | MySQL 主机 | 否 |
 
 ## 前端开发
 
@@ -609,7 +591,18 @@ mvn clean package
 # 跳过测试构建
 mvn clean package -DskipTests
 
+# 单模块构建
+mvn clean package -DskipTests -pl bootstrap
+
 # 前端构建
 cd frontend && npm run build
 ```
+
+## 文档
+
+详细架构文档：
+- [RAG 后端流程详解](docs/RAG后端流程详解.md)
+- [性能优化文档](docs/OPTIMIZATION.md)
+
+RAG 评估脚本：`scripts/rag_evaluator.py`（使用 RAGAS 框架）
 

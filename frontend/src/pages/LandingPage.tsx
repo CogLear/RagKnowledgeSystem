@@ -123,8 +123,11 @@ function HeroSection() {
         </h1>
 
         {/* 副标题 */}
-        <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 mb-10 max-w-2xl mx-auto font-medium tracking-wide">
-          基于检索增强生成的智能问答平台，连接海量知识库，提供精准、及时的 AI 解答体验
+        <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 mb-6 max-w-2xl mx-auto font-medium tracking-wide">
+          检索 → 理解 → 生成：端到端 RAG 流水线架构
+        </p>
+        <p className="text-sm sm:text-base text-gray-500 dark:text-gray-500 mb-10 max-w-2xl mx-auto font-medium tracking-wide">
+          支持查询改写 · 三级意图分类 · 多路并行检索 · MCP 工具调用
         </p>
 
         {/* 按钮组 */}
@@ -225,33 +228,29 @@ function AboutSection() {
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div>
             <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 tracking-tight">
-              检索增强生成知识库系统
+              端到端 RAG 流水线
             </h3>
             <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-6 font-medium">
-              RAG（Retrieval-Augmented
-              Generation）知识库系统是一个结合了先进向量检索技术与大语言模型的智能问答平台。 通过
-              Milvus 向量数据库实现高效的知识检索，再由 Bailian、Ollama、SiliconFlow
-              等大模型生成准确、连贯的答案。
+              <strong>Query Rewrite</strong> → <strong>Intent Classification</strong> → <strong>Multi-Channel Retrieval</strong> →
+              <strong> Rerank</strong> → <strong>Prompt Building</strong> → <strong>LLM Generation</strong>
             </p>
             <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-6 font-medium">
-              系统支持意图智能分类（KB/MCP/SYSTEM 三类），可精准判断用户意图； 内置 MCP
-              工具执行器，支持动态调用外部工具获取实时数据； 配合查询改写（Query
-              Rewrite）优化检索效果，实现上下文深度理解。
+              系统核心在于<strong>查询改写</strong>优化检索召回、<strong>三级意图树</strong>精准判断用户意图（KB/MCP/SYSTEM）、
+              <strong>多路检索</strong>融合向量与关键词匹配、<strong>MCP 协议</strong>动态调用外部工具。
             </p>
             <p className="text-gray-600 dark:text-gray-400 leading-relaxed font-medium">
-              知识写入流程：文档上传 → Tika 解析 → 智能分块 → 向量化 → Milvus 存储。
-              支持多种分块策略（Heading、Paragraph、CodeFence、Atomic），满足不同场景需求。
+              支持 Bailian · Ollama · SiliconFlow 多模型接入，Milvus 向量存储，Redis 分布式缓存。
             </p>
           </div>
           <div className="grid grid-cols-2 gap-4">
             {[
-              { icon: "🔍", title: "向量检索", desc: "Milvus 高效匹配", color: "#FFD93D" },
-              { icon: "🧠", title: "意图分类", desc: "三级树精准判断", color: "#FF6B9D" },
-              { icon: "🔌", title: "MCP 工具", desc: "动态外部调用", color: "#4ECDC4" },
+              { icon: "⚡", title: "查询改写", desc: "LLM 优化 query", color: "#FFD93D" },
+              { icon: "🎯", title: "意图分类", desc: "三级树精准判断", color: "#FF6B9D" },
+              { icon: "🔀", title: "多路检索", desc: "向量+关键词双通道", color: "#4ECDC4" },
               {
-                icon: "📄",
-                title: "文档 ingestion",
-                desc: "Tika + 分块 + 向量化",
+                icon: "🔌",
+                title: "MCP 工具",
+                desc: "外部工具动态调用",
                 color: "#7B2CBF"
               }
             ].map((item, i) => (
@@ -279,33 +278,33 @@ function AboutSection() {
 function FeaturesSection() {
   const features = [
     {
-      title: "意图分类",
-      desc: "三级树分类体系（DOMAIN→CATEGORY→TOPIC），精准判断 KB检索/MCP工具/直接回答",
+      title: "查询改写 Query Rewrite",
+      desc: "基于 LLM 将用户 query 同义扩展、分解，提升检索召回率和答案质量",
       color: "#FFD93D"
     },
     {
-      title: "查询改写",
-      desc: "基于 LLM 的查询优化，同义扩展与拆分，提升检索召回效果",
+      title: "三级意图分类",
+      desc: "DOMAIN → CATEGORY → TOPIC 树形结构，精准区分 KB检索 / MCP工具 / SYSTEM直接回答",
       color: "#FF6B9D"
     },
     {
-      title: "多路检索",
-      desc: "向量检索与文本检索融合，配合重排序算法，返回最优结果",
+      title: "多路并行检索",
+      desc: "Vector Global Search + Intent Directed Search 双通道融合，配合 Rerank 返回最优结果",
       color: "#4ECDC4"
     },
     {
-      title: "MCP 工具",
-      desc: "Model Context Protocol 协议，支持动态调用外部工具获取实时数据",
+      title: "MCP 工具调用",
+      desc: "Model Context Protocol 协议，支持外部工具动态注册与调用，获取实时数据",
       color: "#7B2CBF"
     },
     {
-      title: "智能分块",
-      desc: "多种分块策略（Heading/Paragraph/CodeFence/Atomic），适配不同文档结构",
+      title: "智能文档分块",
+      desc: "Heading / Paragraph / CodeFence / Atomic 多种策略，语义完整性与向量匹配兼顾",
       color: "#FFD93D"
     },
     {
-      title: "多模型支持",
-      desc: "兼容 Bailian、Ollama、SiliconFlow 等多种大语言模型，灵活切换",
+      title: "多模型与向量库",
+      desc: "Bailian · Ollama · SiliconFlow 多模型切换，Milvus 向量库 + Redis 缓存",
       color: "#FF6B9D"
     }
   ];
@@ -350,42 +349,42 @@ function FeaturesSection() {
                   viewBox="0 0 24 24"
                   strokeWidth={2}
                 >
-                  {feature.title === "意图分类" && (
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
-                    />
-                  )}
-                  {feature.title === "查询改写" && (
+                  {feature.title.includes("查询改写") && (
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357 2M15.357 2A8.003 8.003 0 019 15.357"
                     />
                   )}
-                  {feature.title === "多路检索" && (
+                  {feature.title.includes("意图分类") && (
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
+                    />
+                  )}
+                  {feature.title.includes("多路") && (
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                     />
                   )}
-                  {feature.title === "MCP 工具" && (
+                  {feature.title.includes("MCP") && (
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
                     />
                   )}
-                  {feature.title === "智能分块" && (
+                  {feature.title.includes("分块") && (
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"
                     />
                   )}
-                  {feature.title === "多模型支持" && (
+                  {feature.title.includes("多模型") && (
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -412,12 +411,12 @@ function FeaturesSection() {
 function TechSection() {
   const techs = [
     { name: "Spring Boot", type: "Backend", color: "#4ECDC4" },
+    { name: "Spring AI", type: "AI Framework", color: "#7B2CBF" },
     { name: "MyBatis-Plus", type: "ORM", color: "#FF6B9D" },
-    { name: "Milvus", type: "Vector DB", color: "#7B2CBF" },
+    { name: "Milvus", type: "Vector DB", color: "#4ECDC4" },
     { name: "Redis", type: "Cache", color: "#FFD93D" },
     { name: "React 18", type: "Frontend", color: "#4ECDC4" },
     { name: "TypeScript", type: "Language", color: "#FF6B9D" },
-    { name: "Tailwind CSS", type: "Styling", color: "#7B2CBF" },
     { name: "Vite", type: "Build Tool", color: "#FFD93D" }
   ];
 
