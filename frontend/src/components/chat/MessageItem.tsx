@@ -52,9 +52,10 @@ export const MessageItem = React.memo(function MessageItem({ message, isLast }: 
         {!isThinking && hasThinking ? (
           <div
             className={cn(
-              "neo-card overflow-hidden",
+              "overflow-hidden rounded-xl border-2",
               isDark ? "border-[var(--neo-white)]" : "border-[var(--neo-dark)]"
             )}
+            style={{ transition: "none" }}
           >
             <button
               type="button"

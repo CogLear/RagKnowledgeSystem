@@ -15,11 +15,12 @@ export function ThinkingIndicator({ content, duration }: ThinkingIndicatorProps)
   return (
     <div
       className={cn(
-        "neo-card overflow-hidden",
+        "overflow-hidden rounded-xl border-2",
         isAurora
           ? "border-purple-500/50 bg-purple-500/10"
           : "border-[var(--neo-dark)] bg-[var(--neo-white)]"
       )}
+      style={{ transition: "none" }}
     >
       {/* 顶部渐变条 - 主题色 */}
       <div
@@ -38,7 +39,7 @@ export function ThinkingIndicator({ content, duration }: ThinkingIndicatorProps)
             isAurora ? "text-purple-300" : "text-[var(--neo-dark)]"
           )}
         >
-          <Loader2 className="h-4 w-4 animate-spin" />
+          <Loader2 className="h-4 w-4" />
           <span className="text-sm font-medium">正在深度思考...</span>
           {duration ? (
             <span
@@ -67,12 +68,6 @@ export function ThinkingIndicator({ content, duration }: ThinkingIndicatorProps)
           />
           <p className="whitespace-pre-wrap leading-relaxed">
             {content || ""}
-            <span
-              className={cn(
-                "ml-1 inline-block h-4 w-1.5 animate-pulse align-middle",
-                isAurora ? "bg-purple-400" : "bg-[var(--neo-yellow)]"
-              )}
-            />
           </p>
         </div>
       </div>
