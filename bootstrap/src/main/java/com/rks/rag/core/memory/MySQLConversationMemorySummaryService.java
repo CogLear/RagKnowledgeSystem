@@ -611,7 +611,7 @@ public class MySQLConversationMemorySummaryService implements ConversationMemory
         }
 
         // 摘要直接作为 SYSTEM 消息返回，后续 decorateIfNeeded 会添加前缀
-        return new ChatMessage(ChatMessage.Role.SYSTEM, record.getContent());
+        return new ChatMessage(ChatMessage.Role.SYSTEM, record.getContent(), null);
     }
 
     /**

@@ -92,13 +92,18 @@ public class ChatMessage {
     private String content;
 
     /**
+     * 深度思考内容（推理过程），仅 assistant 消息可能包含
+     */
+    private String thinking;
+
+    /**
      * 创建一条系统消息
      *
      * @param content 系统提示词内容
      * @return 封装好的 {@link ChatMessage} 对象，角色为 {@link Role#SYSTEM}
      */
     public static ChatMessage system(String content) {
-        return new ChatMessage(Role.SYSTEM, content);
+        return new ChatMessage(Role.SYSTEM, content, null);
     }
 
     /**
@@ -108,7 +113,7 @@ public class ChatMessage {
      * @return 封装好的 {@link ChatMessage} 对象，角色为 {@link Role#USER}
      */
     public static ChatMessage user(String content) {
-        return new ChatMessage(Role.USER, content);
+        return new ChatMessage(Role.USER, content, null);
     }
 
     /**
@@ -118,6 +123,17 @@ public class ChatMessage {
      * @return 封装好的 {@link ChatMessage} 对象，角色为 {@link Role#ASSISTANT}
      */
     public static ChatMessage assistant(String content) {
-        return new ChatMessage(Role.ASSISTANT, content);
+        return new ChatMessage(Role.ASSISTANT, content, null);
+    }
+
+    /**
+     * 创建一条包含思考内容的助手消息
+     *
+     * @param content 助手回复内容
+     * @param thinking 深度思考内容
+     * @return 封装好的 {@link ChatMessage} 对象，角色为 {@link Role#ASSISTANT}
+     */
+    public static ChatMessage assistant(String content, String thinking) {
+        return new ChatMessage(Role.ASSISTANT, content, thinking);
     }
 }

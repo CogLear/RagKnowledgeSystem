@@ -60,6 +60,7 @@ public class StreamChatEventHandler implements StreamCallback {
     private final StreamTaskManager taskManager;
     private final boolean sendTitleOnComplete;
     private final StringBuilder answer = new StringBuilder();
+    private final StringBuilder thinking = new StringBuilder();
 
     /**
      * 使用参数对象构造（推荐）
@@ -116,9 +117,13 @@ public class StreamChatEventHandler implements StreamCallback {
      */
     private CompletionPayload buildCompletionPayloadOnCancel() {
         String content = answer.toString();
+        String thinkingContent = thinking.toString();
         Long messageId = null;
         if (StrUtil.isNotBlank(content)) {
-            messageId = memoryService.append(conversationId, userId, ChatMessage.assistant(content));
+            messageId = memoryService.append(conversationId, userId,
+                    StrUtil.isNotBlank(thinkingContent)
+                            ? ChatMessage.assistant(content, thinkingContent)
+                            : ChatMessage.assistant(content));
         }
         String title = resolveTitleForEvent();
         return new CompletionPayload(String.valueOf(messageId), title);
@@ -144,6 +149,7 @@ public class StreamChatEventHandler implements StreamCallback {
         if (StrUtil.isBlank(chunk)) {
             return;
         }
+        thinking.append(chunk);
         sendChunked(TYPE_THINK, chunk);
     }
 
@@ -152,8 +158,11 @@ public class StreamChatEventHandler implements StreamCallback {
         if (taskManager.isCancelled(taskId)) {
             return;
         }
+        String thinkingContent = thinking.toString();
         Long messageId = memoryService.append(conversationId, UserContext.getUserId(),
-                ChatMessage.assistant(answer.toString()));
+                StrUtil.isNotBlank(thinkingContent)
+                        ? ChatMessage.assistant(answer.toString(), thinkingContent)
+                        : ChatMessage.assistant(answer.toString()));
         String title = resolveTitleForEvent();
         String messageIdText = messageId == null ? null : String.valueOf(messageId);
         sender.sendEvent(SSEEventType.FINISH.value(), new CompletionPayload(messageIdText, title));

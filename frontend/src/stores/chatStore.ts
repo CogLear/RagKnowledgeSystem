@@ -193,6 +193,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
         id: String(item.id),
         role: item.role === "assistant" ? "assistant" : "user",
         content: item.content,
+        thinking: item.thinking,
         createdAt: item.createTime,
         feedback: mapVoteToFeedback(item.vote),
         status: "done"

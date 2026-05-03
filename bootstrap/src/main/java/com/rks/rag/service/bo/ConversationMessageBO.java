@@ -34,4 +34,9 @@ public class ConversationMessageBO {
      * 消息内容
      */
     private String content;
+
+    /**
+     * 深度思考内容
+     */
+    private String thinking;
 }

@@ -49,6 +49,11 @@ public class ConversationMessageDO {
     private String content;
 
     /**
+     * 深度思考内容（推理过程）
+     */
+    private String thinking;
+
+    /**
      * 创建时间，自动填充
      */
     @TableField(fill = FieldFill.INSERT)

@@ -132,6 +132,7 @@ public class MySQLConversationMemoryStore implements ConversationMemoryStore {
                 .userId(userId)
                 .role(message.getRole().name().toLowerCase())  // USER/ASSISTANT → user/assistant
                 .content(message.getContent())
+                .thinking(message.getThinking())
                 .build();
 
         // ========== 步骤2：消息存储 ==========
@@ -163,7 +164,7 @@ public class MySQLConversationMemoryStore implements ConversationMemoryStore {
             return null;
         }
         ChatMessage.Role role = ChatMessage.Role.fromString(record.getRole());
-        return new ChatMessage(role, record.getContent());
+        return new ChatMessage(role, record.getContent(), record.getThinking());
     }
 
     private List<ChatMessage> normalizeHistory(List<ChatMessage> messages) {

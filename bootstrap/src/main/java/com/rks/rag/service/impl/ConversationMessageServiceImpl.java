@@ -133,6 +133,7 @@ public class ConversationMessageServiceImpl implements ConversationMessageServic
                     .conversationId(record.getConversationId())
                     .role(record.getRole())
                     .content(record.getContent())
+                    .thinking(record.getThinking())
                     .vote(votesByMessageId.get(record.getId()))
                     .createTime(record.getCreateTime())
                     .build();
