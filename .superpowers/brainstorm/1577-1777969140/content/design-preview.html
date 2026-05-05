@@ -1,0 +1,77 @@
+<h2>设计方案预览</h2>
+<p class="subtitle">使用 @dagrejs/dagre 实现从左到右的自动布局</p>
+
+<div class="mockup">
+  <div class="mockup-header">预期效果</div>
+  <div class="mockup-body" style="padding: 30px; background: #f5f5f5;">
+    <div style="display: flex; flex-direction: column; gap: 0; align-items: flex-start;">
+      <!-- Fetcher -->
+      <div style="display: flex; align-items: center; gap: 20px;">
+        <div style="background: white; border: 2px solid #22c55e; border-radius: 8px; padding: 12px 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+          <div style="font-size: 24px;">📥</div>
+          <div style="font-size: 12px; font-weight: bold; color: #333;">Fetcher</div>
+          <div style="font-size: 10px; color: #999;">#1</div>
+        </div>
+        <div style="color: #666; font-size: 20px;">→</div>
+        <div style="background: white; border: 2px solid #3b82f6; border-radius: 8px; padding: 12px 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+          <div style="font-size: 24px;">📄</div>
+          <div style="font-size: 12px; font-weight: bold; color: #333;">Parser</div>
+          <div style="font-size: 10px; color: #999;">#2</div>
+        </div>
+      </div>
+      <div style="height: 40px; border-left: 2px dashed #ccc; margin-left: 60px;"></div>
+      <!-- Chunker -->
+      <div style="display: flex; align-items: center; gap: 20px;">
+        <div style="background: white; border: 2px solid #a855f7; border-radius: 8px; padding: 12px 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+          <div style="font-size: 24px;">✂️</div>
+          <div style="font-size: 12px; font-weight: bold; color: #333;">Chunker</div>
+          <div style="font-size: 10px; color: #999;">#3</div>
+        </div>
+        <div style="color: #666; font-size: 20px;">→</div>
+        <div style="background: white; border: 2px solid #ef4444; border-radius: 8px; padding: 12px 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+          <div style="font-size: 24px;">🔢</div>
+          <div style="font-size: 12px; font-weight: bold; color: #333;">Indexer</div>
+          <div style="font-size: 10px; color: #999;">#4</div>
+        </div>
+      </div>
+    </div>
+    <div style="text-align: center; margin-top: 20px; padding: 10px; background: #e8f5e9; border-radius: 6px; font-size: 13px;">
+      ✅ 节点自动分层排列，整洁美观
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 24px;">
+  <h3>实现要点</h3>
+  <ul style="line-height: 1.8;">
+    <li><strong>安装依赖：</strong><code>@dagrejs/dagre</code></li>
+    <li><strong>新增布局函数：</strong>在 Canvas 或 store 中添加 <code>getLayoutedElements</code> 函数</li>
+    <li><strong>触发时机：</strong>加载已有流水线时自动应用布局</li>
+    <li><strong>节点间距：</strong>可配置的水平/垂直间距</li>
+  </ul>
+</div>
+
+<div class="section">
+  <h3>核心代码逻辑</h3>
+  <pre style="background: #f0f0f0; padding: 12px; border-radius: 6px; font-size: 12px; overflow-x: auto;">
+const dagre = require('@dagrejs/dagre');
+
+function getLayoutedNodes(nodes, edges) {
+  const g = new dagre.graphlib.Graph();
+  g.setDefaultEdgeLabel(() => ({}));
+  g.setGraph({ rankdir: 'LR', nodesep: 80, ranksep: 120 });
+
+  nodes.forEach(node => g.setNode(node.id, { width: 150, height: 60 }));
+  edges.forEach(edge => g.setEdge(edge.source, edge.target));
+
+  dagre.layout(g);
+
+  const layoutedNodes = nodes.map(node => {
+    const { x, y } = g.node(node.id);
+    return { ...node, position: { x, y } };
+  });
+
+  return { nodes: layoutedNodes, edges };
+}
+  </pre>
+</div>
