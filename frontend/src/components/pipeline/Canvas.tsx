@@ -7,6 +7,7 @@ import {
   addEdge,
   useNodesState,
   useEdgesState,
+  useReactFlow,
   Connection,
   Node,
   Edge,
@@ -162,11 +163,15 @@ function CanvasInner() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [nodes, edges, removeNodeFromStore, removeEdgeFromStore]);
 
+  const { screenToFlowPosition } = useReactFlow();
+
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     const nodeType = e.dataTransfer.getData('nodeType') as NodeFormType['nodeType'];
     if (nodeType) {
-      usePipelineBuilderStore.getState().addNode(nodeType);
+      // 将屏幕坐标转换为 Flow 坐标
+      const position = screenToFlowPosition({ x: e.clientX, y: e.clientY });
+      usePipelineBuilderStore.getState().addNode(nodeType, position);
     }
   };
 
@@ -185,7 +190,6 @@ function CanvasInner() {
         onConnect={onConnect}
         nodeTypes={nodeTypes}
         nodesDraggable
-        fitView
         panOnDrag={[1, 2]}
         className="!bg-white"
         defaultEdgeOptions={{

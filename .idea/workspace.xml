@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="94bb44ff-cfc3-4ab9-90c9-10843f4b1508" name="更改" comment="流水线可以更改">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/pipeline/PipelineBuilderDialog.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/pipeline/PipelineBuilderDialog.tsx" afterDir="false" />
-    </list>
+    <list default="true" id="94bb44ff-cfc3-4ab9-90c9-10843f4b1508" name="更改" comment="流水线可以更改" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -429,7 +426,23 @@
       <option name="project" value="LOCAL" />
       <updated>1777982372251</updated>
     </task>
-    <option name="localTasksCounter" value="42" />
+    <task id="LOCAL-00042" summary="流水线可以更改">
+      <option name="closed" value="true" />
+      <created>1777982972258</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1777982972258</updated>
+    </task>
+    <task id="LOCAL-00043" summary="流水线可以更改">
+      <option name="closed" value="true" />
+      <created>1777983128615</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1777983128615</updated>
+    </task>
+    <option name="localTasksCounter" value="44" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
