@@ -245,7 +245,8 @@ export function IngestionPage() {
     open: boolean;
     mode: "create" | "edit";
     pipeline: IngestionPipeline | null;
-  }>({ open: false, mode: "create", pipeline: null });
+    loading?: boolean;
+  }>({ open: false, mode: "create", pipeline: null, loading: false });
   const [pipelineNodesDialog, setPipelineNodesDialog] = useState<{
     open: boolean;
     pipeline: IngestionPipeline | null;
@@ -469,9 +470,14 @@ export function IngestionPage() {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() =>
-                              setPipelineDialog({ open: true, mode: "edit", pipeline })
-                            }
+                            onClick={async () => {
+                              try {
+                                const detail = await getIngestionPipeline(pipeline.id);
+                                setPipelineDialog({ open: true, mode: "edit", pipeline: detail });
+                              } catch (error) {
+                                toast.error(getErrorMessage(error, "获取流水线详情失败"));
+                              }
+                            }}
                           >
                             <Pencil className="mr-0.1 h-4 w-4" />
                             编辑

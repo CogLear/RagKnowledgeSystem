@@ -159,10 +159,8 @@ public class IngestionPipelineServiceImpl implements IngestionPipelineService {
           .set(IngestionPipelineDO::getUpdatedBy, UserContext.getUsername());
         pipelineMapper.update(null, uw);
 
-        // 物理删除节点（不走软删除，因为节点没配 @TableLogic）
-        LambdaQueryWrapper<IngestionPipelineNodeDO> qw = new LambdaQueryWrapper<IngestionPipelineNodeDO>()
-                .eq(IngestionPipelineNodeDO::getPipelineId, pipeline.getId());
-        nodeMapper.delete(qw);
+        // 物理删除节点（绕过软删除，避免残留数据导致唯一键冲突）
+        nodeMapper.physicalDeleteByPipelineId(pipeline.getId());
     }
 
     /**
@@ -206,10 +204,8 @@ public class IngestionPipelineServiceImpl implements IngestionPipelineService {
         if (nodes == null) {
             return;
         }
-        LambdaQueryWrapper<IngestionPipelineNodeDO> qw = new LambdaQueryWrapper<IngestionPipelineNodeDO>()
-                .eq(IngestionPipelineNodeDO::getPipelineId, pipelineId)
-                .eq(IngestionPipelineNodeDO::getDeleted, 0);
-        nodeMapper.delete(qw);
+        // 物理删除所有节点（包含软删除的残留记录），避免唯一键冲突
+        nodeMapper.physicalDeleteByPipelineId(pipelineId);
         for (IngestionPipelineNodeRequest node : nodes) {
             if (node == null) {
                 continue;
