@@ -102,6 +102,13 @@ export default function PipelineBuilderDialog({
       const nextNodeId = nextNodeIdMap[n.id];
       // Remove _nextNodeId from settings before sending to backend
       const { _nextNodeId, ...cleanSettings } = (n.settings || {}) as Record<string, any>;
+
+      // 处理 metadataFields：逗号分隔字符串转为数组，空字符串转为 null
+      if (cleanSettings.metadataFields !== undefined) {
+        const fields = String(cleanSettings.metadataFields || '').trim();
+        cleanSettings.metadataFields = fields ? fields.split(',').map(s => s.trim()).filter(Boolean) : null;
+      }
+
       return {
         nodeId: n.nodeId || n.nodeType.toLowerCase() + '_' + index,
         nodeType: n.nodeType.toLowerCase(),
