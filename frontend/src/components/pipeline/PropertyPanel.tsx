@@ -234,18 +234,22 @@ export default function PropertyPanel() {
             onChange={(v) => handleSettingUpdate('strategy', v)}
             options={['structure_aware', 'fixed_size', 'paragraph', 'sentence']}
           />
-          <ConfigItem
-            label="块大小"
-            type="number"
-            value={settings.chunkSize}
-            onChange={(v) => handleSettingUpdate('chunkSize', v)}
-          />
-          <ConfigItem
-            label="重叠大小"
-            type="number"
-            value={settings.overlapSize}
-            onChange={(v) => handleSettingUpdate('overlapSize', v)}
-          />
+          {settings.strategy !== 'structure_aware' && (
+            <>
+              <ConfigItem
+                label="块大小"
+                type="number"
+                value={settings.chunkSize}
+                onChange={(v) => handleSettingUpdate('chunkSize', v)}
+              />
+              <ConfigItem
+                label="重叠大小"
+                type="number"
+                value={settings.overlapSize}
+                onChange={(v) => handleSettingUpdate('overlapSize', v)}
+              />
+            </>
+          )}
           <ConfigItem
             label="分隔符"
             type="text"
