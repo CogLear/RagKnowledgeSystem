@@ -261,6 +261,8 @@ public class IndexerNode implements IngestionNode {
             }
 
             JsonObject metadata = new JsonObject();
+            metadata.addProperty("kb_id", context.getKbId());
+            metadata.addProperty("doc_id", context.getDocId());
             metadata.addProperty("chunk_index", chunk.getIndex());
             metadata.addProperty("task_id", context.getTaskId());
             metadata.addProperty("pipeline_id", context.getPipelineId());

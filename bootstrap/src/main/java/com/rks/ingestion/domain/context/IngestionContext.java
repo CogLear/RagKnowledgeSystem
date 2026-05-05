@@ -89,6 +89,16 @@ public class IngestionContext {
     private VectorSpaceId vectorSpaceId;
 
     /**
+     * 知识库ID，用于向量删除时的过滤
+     */
+    private String kbId;
+
+    /**
+     * 文档ID，用于向量删除时的过滤
+     */
+    private String docId;
+
+    /**
      * 当前摄取任务的状态
      */
     private IngestionStatus status;

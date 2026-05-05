@@ -520,6 +520,8 @@ public class KnowledgeDocumentServiceImpl implements KnowledgeDocumentService {
             IngestionContext context = IngestionContext.builder()
                     .taskId(docId)
                     .pipelineId(String.valueOf(pipelineId))
+                    .kbId(String.valueOf(documentDO.getKbId()))
+                    .docId(docId)
                     .rawBytes(fileBytes)
                     .mimeType(documentDO.getFileType())
                     .vectorSpaceId(VectorSpaceId.builder()

@@ -5,9 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="94bb44ff-cfc3-4ab9-90c9-10843f4b1508" name="更改" comment="流水线可以更改">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/ingestion/domain/context/IngestionContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/ingestion/domain/context/IngestionContext.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/ingestion/node/IndexerNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/ingestion/node/IndexerNode.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/knowledge/service/impl/KnowledgeDocumentServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/knowledge/service/impl/KnowledgeDocumentServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/rag/service/impl/LocalFileStorageServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/rag/service/impl/LocalFileStorageServiceImpl.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,13 +66,18 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="RagKnowledgeSystemApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+    <configuration name="RagKnowledgeSystemApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
       <module name="bootstrap" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.rks.RagKnowledgeSystemApplication" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Spring Boot.RagKnowledgeSystemApplication" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="应用程序级" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
