@@ -234,7 +234,7 @@ export default function PropertyPanel() {
             onChange={(v) => handleSettingUpdate('strategy', v)}
             options={['structure_aware', 'fixed_size', 'paragraph', 'sentence']}
           />
-          {settings.strategy !== 'structure_aware' && (
+          {settings.strategy !== 'structure_aware' ? (
             <>
               <ConfigItem
                 label="块大小"
@@ -249,7 +249,7 @@ export default function PropertyPanel() {
                 onChange={(v) => handleSettingUpdate('overlapSize', v)}
               />
             </>
-          )}
+          ) : null}
           <ConfigItem
             label="分隔符"
             type="text"
