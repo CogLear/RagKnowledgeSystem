@@ -626,26 +626,31 @@ export function IngestionPage() {
         initialName={pipelineDialog.pipeline?.name || ''}
         initialDescription={pipelineDialog.pipeline?.description || ''}
         onSave={async (nodes, name, description) => {
-          const payload: IngestionPipelinePayload = {
-            name: name,
-            description: description || undefined,
-            nodes: nodes.map((n: any) => ({
-              nodeId: n.nodeId,
-              nodeType: n.nodeType.toLowerCase(),
-              settings: n.settings || null,
-              condition: n.condition || null,
-              nextNodeId: n.nextNodeId || null,
-            })),
-          };
-          if (pipelineDialog.mode === "create") {
-            await createIngestionPipeline(payload);
-            toast.success("创建成功");
-          } else if (pipelineDialog.pipeline) {
-            await updateIngestionPipeline(pipelineDialog.pipeline.id, payload);
-            toast.success("更新成功");
+          try {
+            const payload: IngestionPipelinePayload = {
+              name: name,
+              description: description || undefined,
+              nodes: nodes.map((n: any) => ({
+                nodeId: n.nodeId,
+                nodeType: n.nodeType.toLowerCase(),
+                settings: n.settings || null,
+                condition: n.condition || null,
+                nextNodeId: n.nextNodeId || null,
+              })),
+            };
+            if (pipelineDialog.mode === "create") {
+              await createIngestionPipeline(payload);
+              toast.success("创建成功");
+            } else if (pipelineDialog.pipeline) {
+              await updateIngestionPipeline(pipelineDialog.pipeline.id, payload);
+              toast.success("更新成功");
+            }
+            await loadPipelines(1, pipelineKeyword);
+            await loadPipelineOptions();
+          } catch (error) {
+            toast.error(getErrorMessage(error, "保存失败"));
+            console.error(error);
           }
-          await loadPipelines(1, pipelineKeyword);
-          await loadPipelineOptions();
         }}
       />
 
