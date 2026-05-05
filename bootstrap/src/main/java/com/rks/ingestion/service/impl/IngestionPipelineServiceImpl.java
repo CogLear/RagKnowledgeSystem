@@ -4,6 +4,7 @@ package com.rks.ingestion.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -148,12 +149,17 @@ public class IngestionPipelineServiceImpl implements IngestionPipelineService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void delete(String pipelineId) {
-        IngestionPipelineDO pipeline = pipelineMapper.selectById(pipelineId);
+        Long id = Long.valueOf(pipelineId);
+        IngestionPipelineDO pipeline = pipelineMapper.selectById(id);
         Assert.notNull(pipeline, () -> new ClientException("未找到流水线"));
-        pipeline.setDeleted(1);
-        pipeline.setUpdatedBy(UserContext.getUsername());
-        pipelineMapper.updateById(pipeline);
+        // 使用 update Wrapper 直接更新 deleted 字段，避免实体状态问题
+        LambdaUpdateWrapper<IngestionPipelineDO> uw = new LambdaUpdateWrapper<>();
+        uw.eq(IngestionPipelineDO::getId, id)
+          .set(IngestionPipelineDO::getDeleted, 1)
+          .set(IngestionPipelineDO::getUpdatedBy, UserContext.getUsername());
+        pipelineMapper.update(null, uw);
 
+        // 物理删除节点（不走软删除，因为节点没配 @TableLogic）
         LambdaQueryWrapper<IngestionPipelineNodeDO> qw = new LambdaQueryWrapper<IngestionPipelineNodeDO>()
                 .eq(IngestionPipelineNodeDO::getPipelineId, pipeline.getId());
         nodeMapper.delete(qw);
@@ -201,7 +207,8 @@ public class IngestionPipelineServiceImpl implements IngestionPipelineService {
             return;
         }
         LambdaQueryWrapper<IngestionPipelineNodeDO> qw = new LambdaQueryWrapper<IngestionPipelineNodeDO>()
-                .eq(IngestionPipelineNodeDO::getPipelineId, pipelineId);
+                .eq(IngestionPipelineNodeDO::getPipelineId, pipelineId)
+                .eq(IngestionPipelineNodeDO::getDeleted, 0);
         nodeMapper.delete(qw);
         for (IngestionPipelineNodeRequest node : nodes) {
             if (node == null) {

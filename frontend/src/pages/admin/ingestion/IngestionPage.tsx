@@ -75,6 +75,7 @@ import {
   uploadIngestionTask
 } from "@/services/ingestionService";
 import { getErrorMessage } from "@/utils/error";
+import PipelineBuilderDialog from "@/components/pipeline/PipelineBuilderDialog";
 
 const PIPELINE_PAGE_SIZE = 10;
 const TASK_PAGE_SIZE = 10;
@@ -611,20 +612,32 @@ export function IngestionPage() {
         </Card>
       )}
 
-      <PipelineDialog
+      <PipelineBuilderDialog
         open={pipelineDialog.open}
-        mode={pipelineDialog.mode}
-        pipeline={pipelineDialog.pipeline}
-        onOpenChange={(open) => setPipelineDialog((prev) => ({ ...prev, open }))}
-        onSubmit={async (payload, mode) => {
-          if (mode === "create") {
+        onClose={() => setPipelineDialog({ open: false, mode: "create", pipeline: null })}
+        pipelineId={pipelineDialog.pipeline?.id}
+        initialNodes={pipelineDialog.pipeline?.nodes || []}
+        initialName={pipelineDialog.pipeline?.name || ''}
+        initialDescription={pipelineDialog.pipeline?.description || ''}
+        onSave={async (nodes, name, description) => {
+          const payload: IngestionPipelinePayload = {
+            name: name,
+            description: description || undefined,
+            nodes: nodes.map((n: any) => ({
+              nodeId: n.nodeId,
+              nodeType: n.nodeType.toLowerCase(),
+              settings: n.settings || null,
+              condition: n.condition || null,
+              nextNodeId: n.nextNodeId || null,
+            })),
+          };
+          if (pipelineDialog.mode === "create") {
             await createIngestionPipeline(payload);
             toast.success("创建成功");
           } else if (pipelineDialog.pipeline) {
             await updateIngestionPipeline(pipelineDialog.pipeline.id, payload);
             toast.success("更新成功");
           }
-          setPipelineDialog({ open: false, mode: "create", pipeline: null });
           await loadPipelines(1, pipelineKeyword);
           await loadPipelineOptions();
         }}

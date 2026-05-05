@@ -22,8 +22,12 @@ public class ParserSettings {
     /**
      * 解析规则列表
      * 根据不同MIME类型匹配不同的解析器
+     * 支持三种格式：
+     * - 字符串 "ALL"：表示所有类型
+     * - 对象 {mimeType: "ALL"}：单条规则
+     * - 数组 [{mimeType: "PDF"}, {mimeType: "WORD"}]：多条规则
      */
-    private List<ParserRule> rules;
+    private Object rules;
 
     /**
      * 解析规则配置
