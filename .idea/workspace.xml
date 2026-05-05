@@ -4,11 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="94bb44ff-cfc3-4ab9-90c9-10843f4b1508" name="更改" comment="前端展示页面修改">
+    <list default="true" id="94bb44ff-cfc3-4ab9-90c9-10843f4b1508" name="更改" comment="流水线可以更改">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/ingestion/dao/mapper/IngestionPipelineNodeMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/ingestion/dao/mapper/IngestionPipelineNodeMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/ingestion/service/impl/IngestionPipelineServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/ingestion/service/impl/IngestionPipelineServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/admin/ingestion/IngestionPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/admin/ingestion/IngestionPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/pipeline/PipelineBuilderDialog.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/pipeline/PipelineBuilderDialog.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -407,7 +405,31 @@
       <option name="project" value="LOCAL" />
       <updated>1777804305177</updated>
     </task>
-    <option name="localTasksCounter" value="39" />
+    <task id="LOCAL-00039" summary="流水线可以更改">
+      <option name="closed" value="true" />
+      <created>1777982100591</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1777982100591</updated>
+    </task>
+    <task id="LOCAL-00040" summary="流水线可以更改">
+      <option name="closed" value="true" />
+      <created>1777982359087</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1777982359087</updated>
+    </task>
+    <task id="LOCAL-00041" summary="流水线可以更改">
+      <option name="closed" value="true" />
+      <created>1777982372251</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1777982372251</updated>
+    </task>
+    <option name="localTasksCounter" value="42" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -465,7 +487,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="guest不能修改密码" />
     <MESSAGE value="打包准备" />
     <MESSAGE value="redis密码" />
     <MESSAGE value="修改登录默认用户为guest" />
@@ -490,7 +511,8 @@
     <MESSAGE value="模型速度调用" />
     <MESSAGE value="删除不需要的文档" />
     <MESSAGE value="前端展示页面修改" />
-    <option name="LAST_COMMIT_MESSAGE" value="前端展示页面修改" />
+    <MESSAGE value="流水线可以更改" />
+    <option name="LAST_COMMIT_MESSAGE" value="流水线可以更改" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

@@ -32,6 +32,32 @@ function convertBackendToNodeForm(backendNodes: any[]): NodeForm[] {
         settings = { ...node.settings };
       }
     }
+
+    // 转换 Enhancer tasks：后端对象数组转为前端字符串数组
+    if (node.nodeType?.toUpperCase() === 'ENHANCER' && Array.isArray(settings.tasks)) {
+      settings.tasks = settings.tasks.map((task: any) => task.type || task);
+      settings.modelId = settings.modelId || '';
+      settings.systemPrompt = settings.tasks[0]?.systemPrompt || '';
+    }
+
+    // 转换 Enricher tasks：后端对象数组转为前端字符串数组
+    if (node.nodeType?.toUpperCase() === 'ENRICHER' && Array.isArray(settings.tasks)) {
+      settings.tasks = settings.tasks.map((task: any) => task.type || task);
+      settings.modelId = settings.modelId || '';
+    }
+
+    // 转换 metadataFields：后端数组转为逗号分隔字符串
+    if (node.nodeType?.toUpperCase() === 'INDEXER' && Array.isArray(settings.metadataFields)) {
+      settings.metadataFields = settings.metadataFields.join(',');
+    }
+
+    // 转换 rules：提取 mimeType
+    if (node.nodeType?.toUpperCase() === 'PARSER' && settings.rules) {
+      if (typeof settings.rules === 'object' && settings.rules !== null) {
+        settings.rules = (settings.rules as any).mimeType || 'ALL';
+      }
+    }
+
     return {
       id: String(node.id),
       nodeId: node.nodeId || `node_${index}`,
@@ -103,10 +129,33 @@ export default function PipelineBuilderDialog({
       // Remove _nextNodeId from settings before sending to backend
       const { _nextNodeId, ...cleanSettings } = (n.settings || {}) as Record<string, any>;
 
+      // 处理 Parser 的 parserType（后端不存在此字段）
+      if (cleanSettings.parserType !== undefined) {
+        delete cleanSettings.parserType;
+      }
+
+      // 处理 Enhancer tasks：字符串数组转为对象数组
+      if (n.nodeType === 'ENHANCER' && Array.isArray(cleanSettings.tasks)) {
+        cleanSettings.tasks = cleanSettings.tasks.map((task: string) => ({
+          type: task,
+          systemPrompt: '',
+          userPromptTemplate: '',
+        }));
+      }
+
+      // 处理 Enricher tasks：字符串数组转为对象数组
+      if (n.nodeType === 'ENRICHER' && Array.isArray(cleanSettings.tasks)) {
+        cleanSettings.tasks = cleanSettings.tasks.map((task: string) => ({
+          type: task,
+          systemPrompt: '',
+          userPromptTemplate: '',
+        }));
+      }
+
       // 处理 metadataFields：逗号分隔字符串转为数组，空字符串转为 null
       if (cleanSettings.metadataFields !== undefined) {
         const fields = String(cleanSettings.metadataFields || '').trim();
-        cleanSettings.metadataFields = fields ? fields.split(',').map(s => s.trim()).filter(Boolean) : null;
+        cleanSettings.metadataFields = fields ? fields.split(',').map((s: string) => s.trim()).filter(Boolean) : null;
       }
 
       return {
