@@ -115,9 +115,9 @@ public class LocalFileStorageServiceImpl implements FileStorageService {
      * @param url S3 协议的 URL
      */
     @Override
-    @SneakyThrows
     public void deleteByUrl(String url) {
-        FileSystemUtils.deleteRecursively(Path.of(url));
+        S3Location loc = parseS3Url(url);
+        s3Client.deleteObject(b -> b.bucket(loc.bucket()).key(loc.key()));
     }
 
     /**

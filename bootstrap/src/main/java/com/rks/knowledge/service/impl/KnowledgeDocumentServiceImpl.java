@@ -597,11 +597,19 @@ public class KnowledgeDocumentServiceImpl implements KnowledgeDocumentService {
         KnowledgeDocumentDO documentDO = docMapper.selectById(docId);
         Assert.notNull(documentDO, () -> new ClientException("文档不存在"));
 
+        // 删除知识库中的向量数据（Milvus）
+        vectorStoreService.deleteDocumentVectors(String.valueOf(documentDO.getKbId()), docId);
+        // 删除知识库中的 Chunk 记录（MySQL 软删除）
+        knowledgeChunkService.deleteByDocId(docId);
+        // 删除 RUSTFS 中的原始文件
+        if (StringUtils.hasText(documentDO.getFileUrl())) {
+            fileStorageService.deleteByUrl(documentDO.getFileUrl());
+        }
+
+        // 软删除文档记录
         documentDO.setDeleted(1);
         documentDO.setUpdatedBy(UserContext.getUsername());
         docMapper.deleteById(documentDO);
-
-        vectorStoreService.deleteDocumentVectors(String.valueOf(documentDO.getKbId()), docId);
     }
 
     /**
