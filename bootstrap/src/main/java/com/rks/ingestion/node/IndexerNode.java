@@ -248,6 +248,8 @@ public class IndexerNode implements IngestionNode {
                                        List<String> metadataFields) {
         Map<String, Object> mergedMetadata = mergeMetadata(context);
         List<JsonObject> rows = new java.util.ArrayList<>(chunks.size());
+        String kbId = context.getKbId();
+        String docId = context.getDocId();
         for (int i = 0; i < chunks.size(); i++) {
             VectorChunk chunk = chunks.get(i);
             String chunkId = StringUtils.hasText(chunk.getChunkId()) ? chunk.getChunkId() : IdUtil.getSnowflakeNextIdStr();
@@ -261,8 +263,8 @@ public class IndexerNode implements IngestionNode {
             }
 
             JsonObject metadata = new JsonObject();
-            metadata.addProperty("kb_id", context.getKbId());
-            metadata.addProperty("doc_id", context.getDocId());
+            metadata.addProperty("kb_id", kbId);
+            metadata.addProperty("doc_id", docId);
             metadata.addProperty("chunk_index", chunk.getIndex());
             metadata.addProperty("task_id", context.getTaskId());
             metadata.addProperty("pipeline_id", context.getPipelineId());

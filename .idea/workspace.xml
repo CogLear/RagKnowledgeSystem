@@ -4,10 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="94bb44ff-cfc3-4ab9-90c9-10843f4b1508" name="更改" comment="流水线可以更改">
-      <change beforePath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/ingestion/domain/context/IngestionContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/ingestion/domain/context/IngestionContext.java" afterDir="false" />
+    <list default="true" id="94bb44ff-cfc3-4ab9-90c9-10843f4b1508" name="更改" comment="修复知识库的不能删除bug">
       <change beforePath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/ingestion/node/IndexerNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/ingestion/node/IndexerNode.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/knowledge/service/impl/KnowledgeDocumentServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/knowledge/service/impl/KnowledgeDocumentServiceImpl.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -460,7 +458,15 @@
       <option name="project" value="LOCAL" />
       <updated>1777987865523</updated>
     </task>
-    <option name="localTasksCounter" value="45" />
+    <task id="LOCAL-00045" summary="修复知识库的不能删除bug">
+      <option name="closed" value="true" />
+      <created>1777992284981</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1777992284981</updated>
+    </task>
+    <option name="localTasksCounter" value="46" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -518,7 +524,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="打包准备" />
     <MESSAGE value="redis密码" />
     <MESSAGE value="修改登录默认用户为guest" />
     <MESSAGE value="修复知识库删除资源泄漏" />
@@ -543,7 +548,8 @@
     <MESSAGE value="删除不需要的文档" />
     <MESSAGE value="前端展示页面修改" />
     <MESSAGE value="流水线可以更改" />
-    <option name="LAST_COMMIT_MESSAGE" value="流水线可以更改" />
+    <MESSAGE value="修复知识库的不能删除bug" />
+    <option name="LAST_COMMIT_MESSAGE" value="修复知识库的不能删除bug" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
