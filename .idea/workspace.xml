@@ -5,7 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="94bb44ff-cfc3-4ab9-90c9-10843f4b1508" name="更改" comment="修复知识库的不能删除bug">
-      <change beforePath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/ingestion/node/IndexerNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/ingestion/node/IndexerNode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/ingestion/domain/settings/ParserSettings.java" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/ingestion/domain/settings/ParserSettings.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/ingestion/node/ParserNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/src/main/java/com/rks/ingestion/node/ParserNode.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,6 +66,20 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="MCPServerApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="mcp-server" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.rks.mcp.MCPServerApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="RagKnowledgeSystemApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
+      <module name="bootstrap" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.rks.RagKnowledgeSystemApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="RagKnowledgeSystemApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
       <module name="bootstrap" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.rks.RagKnowledgeSystemApplication" />
@@ -105,6 +121,7 @@
       <workItem from="1777645340749" duration="5408000" />
       <workItem from="1777948504720" duration="10507000" />
       <workItem from="1777987797388" duration="1639000" />
+      <workItem from="1778038806962" duration="773000" />
     </task>
     <task id="LOCAL-00001" summary="初次提交">
       <option name="closed" value="true" />
@@ -466,7 +483,15 @@
       <option name="project" value="LOCAL" />
       <updated>1777992284981</updated>
     </task>
-    <option name="localTasksCounter" value="46" />
+    <task id="LOCAL-00046" summary="修复知识库的不能删除bug">
+      <option name="closed" value="true" />
+      <created>1777992894576</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1777992894576</updated>
+    </task>
+    <option name="localTasksCounter" value="47" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

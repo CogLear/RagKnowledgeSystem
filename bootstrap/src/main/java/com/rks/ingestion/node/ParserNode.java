@@ -20,10 +20,8 @@ import org.springframework.util.StringUtils;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+
 
 /**
  * 文档解析节点
@@ -160,16 +158,14 @@ public class ParserNode implements IngestionNode {
      * 如果配置了规则但文件类型不匹配，则抛出异常
      */
     private void validateMimeType(ParserSettings settings, String mimeType, String fileName) {
-        if (settings == null || settings.getRules() == null || ((List) settings.getRules()).isEmpty()) {
-            // 没有配置规则，允许所有类型
+        if (settings == null || !settings.hasRules()) {
             return;
         }
 
         String resolvedType = resolveType(mimeType, fileName);
 
-        // 检查是否有匹配的规则
         boolean hasMatch = false;
-        for (ParserSettings.ParserRule rule : (List<ParserSettings.ParserRule>) settings.getRules()) {
+        for (ParserSettings.ParserRule rule : settings.getNormalizedRules()) {
             if (rule == null || !StringUtils.hasText(rule.getMimeType())) {
                 continue;
             }
@@ -184,8 +180,7 @@ public class ParserNode implements IngestionNode {
         }
 
         if (!hasMatch) {
-            // 构建允许的类型列表用于错误提示
-            List<String> allowedTypes = ((List<ParserSettings.ParserRule>) settings.getRules()).stream()
+            List<String> allowedTypes = settings.getNormalizedRules().stream()
                     .filter(rule -> rule != null && StringUtils.hasText(rule.getMimeType()))
                     .map(rule -> normalizeType(rule.getMimeType()))
                     .filter(StringUtils::hasText)
@@ -204,63 +199,15 @@ public class ParserNode implements IngestionNode {
         if (node == null || node.isNull()) {
             return ParserSettings.builder().rules(List.of()).build();
         }
-        ParserSettings settings = objectMapper.convertValue(node, ParserSettings.class);
-        // 规范化 rules 字段：支持字符串、对象、数组三种格式
-        settings.setRules(normalizeRules(settings.getRules()));
-        return settings;
-    }
-
-    /**
-     * 规范化 rules 字段为 List<ParserRule>
-     * 支持：
-     * - null 或空：返回空列表
-     * - 字符串 "ALL"：返回 [{mimeType:"ALL"}]
-     * - 单个对象 {mimeType:"XX"}：返回 [rule]
-     * - 数组 [{}]：直接返回
-     */
-    private List<ParserSettings.ParserRule> normalizeRules(Object rules) {
-        if (rules == null) {
-            return List.of();
-        }
-        if (rules instanceof String) {
-            String s = ((String) rules).trim();
-            if ("ALL".equalsIgnoreCase(s) || s.isEmpty()) {
-                return List.of(ParserSettings.ParserRule.builder().mimeType("ALL").build());
-            }
-            // 可能是逗号分隔的多类型 "PDF,WORD"
-            return Arrays.stream(s.split(","))
-                    .map(String::trim)
-                    .filter(x -> !x.isEmpty())
-                    .map(x -> ParserSettings.ParserRule.builder().mimeType(x.toUpperCase(java.util.Locale.ROOT)).build())
-                    .collect(Collectors.toList());
-        }
-        if (rules instanceof List) {
-            return (List) rules;
-        }
-        if (rules instanceof ParserSettings.ParserRule) {
-            return List.of((ParserSettings.ParserRule) rules);
-        }
-        if (rules instanceof Map) {
-            @SuppressWarnings("unchecked")
-            Map<String, Object> map = (Map<String, Object>) rules;
-            if ("ALL".equalsIgnoreCase(String.valueOf(map.getOrDefault("mimeType", "")))) {
-                return List.of(ParserSettings.ParserRule.builder().mimeType("ALL").build());
-            }
-            ParserSettings.ParserRule rule = ParserSettings.ParserRule.builder()
-                    .mimeType(String.valueOf(map.getOrDefault("mimeType", "ALL")))
-                    .options((Map<String, Object>) map.get("options"))
-                    .build();
-            return List.of(rule);
-        }
-        return List.of();
+        return objectMapper.convertValue(node, ParserSettings.class);
     }
 
     private ParserSettings.ParserRule matchRule(ParserSettings settings, String mimeType, String fileName) {
-        if (settings == null || settings.getRules() == null || ((List) settings.getRules()).isEmpty()) {
+        if (settings == null || !settings.hasRules()) {
             return null;
         }
         String resolvedType = resolveType(mimeType, fileName);
-        for (ParserSettings.ParserRule rule : (List<ParserSettings.ParserRule>) settings.getRules()) {
+        for (ParserSettings.ParserRule rule : settings.getNormalizedRules()) {
             if (rule == null || !StringUtils.hasText(rule.getMimeType())) {
                 continue;
             }
